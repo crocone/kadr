@@ -1,0 +1,92 @@
+/*
+ * Страницы GitHub Pages: политика приватности — обязательное поле листинга (PLAN.md §9).
+ * Оформление намеренно скромное и без единого внешнего запроса: шрифты системные,
+ * картинок нет, тема следует за системной.
+ */
+:root {
+  color-scheme: light dark;
+  --bg: #ffffff;
+  --fg: #14171c;
+  --muted: #5b6371;
+  --line: #e0e3e9;
+  --accent: #5a49e0;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0a0b0e;
+    --fg: #e6e8ec;
+    --muted: #8a919d;
+    --line: #23272e;
+    --accent: #9c8dff;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font:
+    16px/1.65 ui-sans-serif,
+    system-ui,
+    'Segoe UI',
+    Roboto,
+    Arial,
+    sans-serif;
+  letter-spacing: -0.006em;
+}
+
+main {
+  max-width: 46rem;
+  margin: 0 auto;
+  padding: 3rem 1.25rem 5rem;
+}
+
+h1 {
+  font-size: 1.75rem;
+  line-height: 1.2;
+  margin: 2rem 0 0.5rem;
+}
+
+h2 {
+  font-size: 1.05rem;
+  margin: 2rem 0 0.5rem;
+}
+
+p,
+ul {
+  margin: 0.75rem 0;
+}
+
+li {
+  margin: 0.35rem 0;
+}
+
+a {
+  color: var(--accent);
+}
+
+code {
+  font-family: ui-monospace, 'Cascadia Code', SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.9em;
+  padding: 0.05em 0.3em;
+  border: 1px solid var(--line);
+  border-radius: 0.35em;
+}
+
+hr {
+  margin: 3rem 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+}
+
+.meta,
+.back {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.lead {
+  font-size: 1.05rem;
+  color: var(--muted);
+}

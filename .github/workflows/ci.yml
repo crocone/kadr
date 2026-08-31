@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      - name: Type-check
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Format check
+        run: npm run format:check
+
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      # Сценарии расширения гоняются на собранном dist/: Playwright ставит Chrome
+      # с расширением и проверяет то, чего не видит Vitest, — что пакет действительно
+      # ставится, страницы открываются и хранилища работают не в моках.
+      - name: Install Chromium for Playwright
+        run: npx playwright install --with-deps chromium
+
+      - name: End-to-end
+        run: npx playwright test
+
+      # Загруженный артефакт даёт возможность поставить сборку из PR распакованной,
+      # не собирая её локально.
+      - uses: actions/upload-artifact@v5
+        with:
+          name: kadr-unpacked
+          path: dist
+          retention-days: 7
+
+      - if: failure()
+        uses: actions/upload-artifact@v5
+        with:
+          name: playwright-report
+          path: playwright-report
+          retention-days: 7

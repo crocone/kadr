@@ -1,0 +1,76 @@
+name: Release
+
+# Один тег — один релиз: zip для Chrome Web Store, Opera и Edge (пакет у всех трёх
+# один и тот же) плюс архив исходников, который просит ревью CWS. См. PLAN.md §9.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # Архив исходников собирается из `git ls-files`, поэтому нужна вся история,
+          # а не срез в один коммит.
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      # Тег и версия в package.json обязаны совпадать: разошедшись, они дают релиз,
+      # в котором написано одно, а внутри лежит другое.
+      - name: Check the tag against the version
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          version="$(node -p "require('./package.json').version")"
+          if [ "$tag" != "$version" ]; then
+            echo "tag $GITHUB_REF_NAME does not match package.json version $version"
+            exit 1
+          fi
+
+      - name: Type-check
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Format check
+        run: npm run format:check
+
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: Pack
+        run: |
+          npm run zip
+          npm run zip:source
+
+      - uses: actions/upload-artifact@v5
+        with:
+          name: kadr-release
+          path: release/*.zip
+          retention-days: 30
+
+      - name: Publish the release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" release/*.zip \
+            --title "$GITHUB_REF_NAME" \
+            --generate-notes \
+            --notes "The same package goes to the Chrome Web Store, Opera Add-ons and Edge Add-ons. The \`-source\` archive is the code that produced it."

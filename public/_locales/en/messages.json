@@ -1,0 +1,25 @@
+{
+  "extName": {
+    "message": "Kadr — screenshots & step guides",
+    "description": "Extension name shown in the store and the toolbar"
+  },
+  "extDescription": {
+    "message": "Capture any page, beautify the shot and turn clicks into a step guide. No trial, no watermarks, no PRO lock.",
+    "description": "Extension description shown in the store"
+  },
+  "cmdCaptureFullPage": {
+    "message": "Capture the full page"
+  },
+  "cmdCaptureVisible": {
+    "message": "Capture the visible area"
+  },
+  "cmdCaptureArea": {
+    "message": "Capture a selected area"
+  },
+  "cmdCaptureElement": {
+    "message": "Capture a page element"
+  },
+  "cmdCaptureScroll": {
+    "message": "Capture a chat or a feed while it scrolls"
+  }
+}

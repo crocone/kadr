@@ -1,0 +1,114 @@
+@import 'tailwindcss';
+
+/*
+ * Styling per the "Studio" mockup: dark shell, purple accent, dense grid.
+ *
+ * The theme is always resolved in JS: <html> gets data-theme="light" | "dark" even
+ * when the user picked "system". CSS then has one state instead of three, and the
+ * editor preview cannot diverge from the export.
+ *
+ * Fonts are system stacks, not bundled files. The mockup asked for Instrument Sans
+ * and JetBrains Mono via a Google Fonts link, but that is a network request: it would
+ * break the "no requests except explicitly triggered AI actions" promise and would be
+ * blocked by the extension CSP anyway. If the fonts are installed, they are used.
+ */
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+@theme {
+  /* Light theme. Dark is below — it is the primary one in the mockup. */
+  --color-bg: #eef0f4;
+  --color-surface: #ffffff;
+  --color-raised: #ffffff;
+  --color-surface-muted: #f2f3f6;
+  --color-border: #e0e3e9;
+  --color-border-strong: #c8cdd6;
+  --color-text: #14171c;
+  --color-text-soft: #464d58;
+  --color-text-muted: #6b7280;
+  --color-accent: #6d5cf5;
+  --color-accent-hover: #5a49e0;
+  --color-accent-fg: #ffffff;
+  --color-accent-soft: #ece9ff;
+  --color-danger: #e0344f;
+  --color-success: #12a06a;
+  --color-warning: #b7791f;
+
+  /* Dot grid of the work surface. */
+  --color-grid-dot: #d6dae1;
+
+  --radius-panel: 0.875rem;
+  --radius-control: 0.5625rem;
+  --radius-tool: 0.6875rem;
+
+  --shadow-panel: 0 1px 2px rgb(20 22 26 / 0.05), 0 12px 32px rgb(20 22 26 / 0.1);
+  --shadow-float: 0 18px 50px rgb(20 22 26 / 0.16);
+
+  /* Instrument Sans is a geometric grotesque; the stack is matched by character. */
+  --font-sans:
+    'Instrument Sans', ui-sans-serif, system-ui, 'Segoe UI Variable Text', 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+  --font-mono:
+    'JetBrains Mono', ui-monospace, 'Cascadia Code', SFMono-Regular, 'SF Mono', Menlo, Consolas,
+    monospace;
+}
+
+:root[data-theme='dark'] {
+  --color-bg: #0a0b0e;
+  --color-surface: #101215;
+  --color-raised: #14171c;
+  --color-surface-muted: #171b21;
+  --color-border: #23272e;
+  --color-border-strong: #2b3038;
+  --color-text: #e6e8ec;
+  --color-text-soft: #c3c8d1;
+  --color-text-muted: #7c838f;
+  --color-accent: #6d5cf5;
+  --color-accent-hover: #8f7dff;
+  --color-accent-fg: #ffffff;
+  --color-accent-soft: #1d1b3a;
+  --color-danger: #f0526b;
+  --color-success: #3ddc97;
+  --color-warning: #f5a524;
+
+  --color-grid-dot: #181c22;
+
+  --shadow-panel: 0 1px 2px rgb(0 0 0 / 0.5), 0 18px 48px rgb(0 0 0 / 0.45);
+  --shadow-float: 0 30px 80px rgb(0 0 0 / 0.55);
+}
+
+@layer base {
+  html {
+    color-scheme: light;
+  }
+
+  html[data-theme='dark'] {
+    color-scheme: dark;
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    letter-spacing: -0.006em;
+    -webkit-font-smoothing: antialiased;
+    text-wrap: pretty;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  /* Panel scrollbars: thin and border-coloured, so they do not clash with the mockup. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border-strong) transparent;
+  }
+}
+
+@utility work-surface {
+  background-color: var(--color-bg);
+  background-image: radial-gradient(var(--color-grid-dot) 1px, transparent 1px);
+  background-size: 22px 22px;
+}

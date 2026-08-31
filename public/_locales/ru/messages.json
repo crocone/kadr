@@ -1,0 +1,25 @@
+{
+  "extName": {
+    "message": "Kadr — скриншоты и инструкции",
+    "description": "Название расширения в сторе и на панели"
+  },
+  "extDescription": {
+    "message": "Захват любой страницы, оформление кадра и инструкция из кликов. Без триала, вотермарок и PRO-замка.",
+    "description": "Описание расширения в сторе"
+  },
+  "cmdCaptureFullPage": {
+    "message": "Снять всю страницу"
+  },
+  "cmdCaptureVisible": {
+    "message": "Снять видимую область"
+  },
+  "cmdCaptureArea": {
+    "message": "Снять выделенную область"
+  },
+  "cmdCaptureElement": {
+    "message": "Снять элемент страницы"
+  },
+  "cmdCaptureScroll": {
+    "message": "Снять чат или ленту с прокруткой"
+  }
+}

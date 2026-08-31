@@ -1,0 +1,58 @@
+name: Bug report
+description: Something is broken or a capture came out wrong
+labels: ['bug']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        If the bug involves a screenshot with private data in it, crop or redact before attaching.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What you did, what you expected, what you got instead.
+    validations:
+      required: true
+  - type: input
+    id: page
+    attributes:
+      label: Page it happens on
+      description: A public URL that reproduces it, if there is one.
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Capture mode
+      options:
+        - Full page
+        - Visible area
+        - Selected area
+        - DOM element
+        - Not a capture bug
+    validations:
+      required: true
+  - type: checkboxes
+    id: precision
+    attributes:
+      label: High-precision (CDP) mode
+      options:
+        - label: The bug happens with high-precision capture on
+        - label: The bug happens with high-precision capture off
+  - type: input
+    id: version
+    attributes:
+      label: Kadr version
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and version
+      placeholder: Chrome 141 / Yandex 25.4 / Edge 141
+    validations:
+      required: true
+  - type: textarea
+    id: console
+    attributes:
+      label: Console output
+      description: Errors from the service worker or the page console, if any.
+      render: text

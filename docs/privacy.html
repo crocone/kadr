@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Kadr — privacy policy</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main>
+      <p class="back"><a href="./">← Kadr</a></p>
+
+      <h1>Privacy policy</h1>
+      <p class="meta">Last updated: 31 August 2026 · applies to the Kadr browser extension</p>
+
+      <h2>The short version</h2>
+      <p>
+        Kadr has no backend and no analytics. Screenshots, documents and settings stay in the
+        browser on your computer. Nothing is sent anywhere unless you press a button that says it
+        will send something.
+      </p>
+
+      <h2>What is stored, and where</h2>
+      <ul>
+        <li>
+          <b>Screenshots, documents and style presets</b> — in the browser’s IndexedDB, on this
+          computer. They are removed when you delete them in the library or remove the extension.
+        </li>
+        <li>
+          <b>Settings, API keys and tracker tokens</b> — in <code>chrome.storage.local</code>.
+          Deliberately <em>local</em> and not <code>sync</code>: keys must not travel to a cloud
+          account.
+        </li>
+      </ul>
+
+      <h2>What leaves the device, and only when you ask</h2>
+      <ul>
+        <li>
+          <b>An AI action.</b> If you enable AI and enter your own key, the image on the canvas and
+          your prompt go straight to the endpoint you configured — OpenAI, Anthropic, Google,
+          OpenRouter, or a local server. They do not pass through us; we have no server in this
+          path. What that provider does with the data is governed by their terms.
+        </li>
+        <li>
+          <b>The local OCR dictionary.</b> The first offline text recognition downloads a language
+          file for Tesseract. The request carries no data about you, and nothing about the image
+          leaves the device: recognition itself runs in the browser.
+        </li>
+        <li>
+          <b>Sending a shot to an issue tracker.</b> If you configure GitHub, Linear or Jira, the
+          picture, the title, your description and the page context (url, browser, screen size) go
+          to that tracker with your token. Access to the tracker host is requested at that moment,
+          not at install time.
+        </li>
+      </ul>
+
+      <h2>What never happens</h2>
+      <ul>
+        <li>No telemetry, no analytics, no crash reporting, no “anonymous usage statistics”.</li>
+        <li>No account, no sign-up, no advertising, no third-party trackers.</li>
+        <li>
+          No selling or sharing of any data, because none of it reaches us in the first place.
+        </li>
+      </ul>
+
+      <h2>Permissions and why they exist</h2>
+      <ul>
+        <li>
+          <code>activeTab</code>, <code>scripting</code> — read the page you are capturing, at the
+          moment you start a capture.
+        </li>
+        <li>
+          <code>storage</code>, <code>unlimitedStorage</code> — keep documents, shots and settings
+          locally.
+        </li>
+        <li><code>downloads</code> — save the exported file.</li>
+        <li><code>clipboardWrite</code> — copy the shot when you press Copy.</li>
+        <li>
+          <code>contextMenus</code>, <code>offscreen</code> — the right-click entry points and
+          rendering outside the service worker.
+        </li>
+        <li>
+          Host access — optional, one site at a time and always behind a button: reshooting a saved
+          shot, recording a step guide across pages, sending to your issue tracker.
+        </li>
+      </ul>
+
+      <h2>Contact</h2>
+      <p>
+        Questions and reports: open an issue in the
+        <a href="https://github.com/crocone/kadr">repository</a>. The extension is open source —
+        every claim on this page can be checked in the code.
+      </p>
+
+      <hr />
+
+      <h1 lang="ru">Политика приватности</h1>
+      <p class="meta" lang="ru">Обновлено 31 августа 2026 · относится к расширению Kadr</p>
+
+      <div lang="ru">
+        <h2>Коротко</h2>
+        <p>
+          У Kadr нет сервера и нет аналитики. Скриншоты, документы и настройки остаются в браузере
+          на вашем компьютере. Никуда ничего не уходит, пока вы не нажмёте кнопку, которая прямо
+          говорит, что что-то отправит.
+        </p>
+
+        <h2>Что хранится и где</h2>
+        <ul>
+          <li>
+            <b>Снимки, документы и пресеты стилей</b> — в IndexedDB браузера, на этом компьютере.
+            Удаляются, когда вы удаляете их в библиотеке или удаляете само расширение.
+          </li>
+          <li>
+            <b>Настройки, ключи ИИ и токены трекеров</b> — в <code>chrome.storage.local</code>.
+            Именно <em>local</em>, а не <code>sync</code>: ключам нечего делать в облачной учётке.
+          </li>
+        </ul>
+
+        <h2>Что уходит наружу — и только по вашему действию</h2>
+        <ul>
+          <li>
+            <b>Действие ИИ.</b> Если вы включили ИИ и ввели свой ключ, изображение с холста и ваш
+            запрос уходят напрямую на указанный вами эндпоинт — OpenAI, Anthropic, Google,
+            OpenRouter или локальный сервер. Через нас они не проходят: в этой цепочке нашего
+            сервера нет. Что делает с данными провайдер, определяют его условия.
+          </li>
+          <li>
+            <b>Словарь локального OCR.</b> Первое офлайн-распознавание скачивает языковой файл для
+            Tesseract. В запросе нет никаких данных о вас, и изображение не покидает устройство:
+            распознавание идёт в браузере.
+          </li>
+          <li>
+            <b>Отправка снимка в трекер.</b> Если вы настроили GitHub, Linear или Jira, картинка,
+            заголовок, ваше описание и контекст страницы (адрес, браузер, размер экрана) уходят в
+            этот трекер с вашим токеном. Доступ к адресу трекера запрашивается в этот момент, а не
+            при установке.
+          </li>
+        </ul>
+
+        <h2>Чего не происходит никогда</h2>
+        <ul>
+          <li>Ни телеметрии, ни аналитики, ни отчётов о падениях, ни «анонимной статистики».</li>
+          <li>Ни аккаунта, ни регистрации, ни рекламы, ни сторонних трекеров.</li>
+          <li>Никакой продажи или передачи данных — они до нас попросту не доходят.</li>
+        </ul>
+
+        <h2>Разрешения и зачем они</h2>
+        <ul>
+          <li>
+            <code>activeTab</code>, <code>scripting</code> — прочитать страницу, которую вы
+            снимаете, в момент запуска захвата.
+          </li>
+          <li>
+            <code>storage</code>, <code>unlimitedStorage</code> — хранить документы, кадры и
+            настройки локально.
+          </li>
+          <li><code>downloads</code> — сохранить файл экспорта.</li>
+          <li><code>clipboardWrite</code> — скопировать кадр по кнопке «Копировать».</li>
+          <li>
+            <code>contextMenus</code>, <code>offscreen</code> — пункты контекстного меню и рендер
+            вне service worker.
+          </li>
+          <li>
+            Доступ к хостам — опционально, по одному сайту и всегда по кнопке: пересъёмка
+            сохранённого кадра, запись инструкции с переходами, отправка в ваш трекер.
+          </li>
+        </ul>
+
+        <h2>Связь</h2>
+        <p>
+          Вопросы и сообщения об ошибках — issue в
+          <a href="https://github.com/crocone/kadr">репозитории</a>. Расширение открыто: любое
+          утверждение с этой страницы проверяется по коду.
+        </p>
+      </div>
+    </main>
+  </body>
+</html>

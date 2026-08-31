@@ -1,0 +1,6 @@
+# Prettier enforces LF, so keep working copies LF on every platform —
+# otherwise `npm run format:check` fails on a fresh Windows clone.
+* text=auto eol=lf
+
+*.png binary
+*.zip binary

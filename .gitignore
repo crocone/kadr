@@ -1,0 +1,17 @@
+node_modules/
+dist/
+release/
+coverage/
+test-results/
+playwright-report/
+*.local
+.DS_Store
+.idea/
+.vscode/
+*.log
+
+# The plan is the working document, not part of the package.
+PLAN.md
+
+# Local agent state, not part of the project.
+.claude
