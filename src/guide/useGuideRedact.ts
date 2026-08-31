@@ -1,5 +1,5 @@
 /**
- * One-click redaction across the whole guide (PLAN.md §6.5).
+ * One-click redaction across the whole guide.
  *
  * A single screenshot lets the user review findings one by one, but a guide of an
  * internal panel has far more of them (email in the header on every step, a token in
@@ -8,7 +8,7 @@
  *
  * Everything is local: OCR runs in the browser, and the only network request is a
  * one-time language dictionary download. Guide frames are never sent anywhere
- * (PLAN.md §7).
+ *.
  */
 import { useCallback, useState } from 'react'
 

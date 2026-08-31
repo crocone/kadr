@@ -1,6 +1,6 @@
 /**
  * Settings live in `chrome.storage.local`, not `sync`: sync would ship them to
- * Google's cloud along with the AI provider keys (PLAN.md §7).
+ * Google's cloud along with the AI provider keys.
  */
 import type { Transport } from '@/core/ai/types'
 import type { Locale } from '@/core/i18n/locales'
@@ -14,7 +14,7 @@ export type Settings = {
   locale: LocalePreference
   /** Capture delay in seconds: time to open a menu or a hover state. */
   captureDelaySec: 0 | 3 | 5 | 10
-  /** Filename template, see PLAN.md §6. */
+  /** Filename template. */
   filenameTemplate: string
   /** AI is off by default and makes zero requests until enabled. */
   aiEnabled: boolean
@@ -30,7 +30,7 @@ export type Settings = {
   aiImageModel: string
   /**
    * Provider key. Kept in local, not sync: sync would ship it to Google's cloud
-   * with the rest of the settings (PLAN.md §7).
+   * with the rest of the settings.
    */
   aiKey: string
   /** Tracker the editor suggests by default. */

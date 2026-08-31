@@ -1,5 +1,5 @@
 /**
- * Per-site permission, requested on a button press (PLAN.md §6.5).
+ * Per-site permission, requested on a button press.
  *
  * The manifest declares `optional_host_permissions` as `<all_urls>` — otherwise
  * Chrome won't allow requesting an arbitrary origin. But we always ask for one

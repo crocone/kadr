@@ -1,5 +1,5 @@
 /**
- * Reshoot button above the frame (PLAN.md §6.5).
+ * Reshoot button above the frame.
  *
  * Deliberately sits next to "crop": both actions change the shot itself, not the
  * dressing around it. Documents without a capture recipe get no button at all —

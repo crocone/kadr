@@ -1,5 +1,5 @@
 /**
- * Screenshot library: search by domain, date, tags, and OCR text (PLAN.md §6).
+ * Screenshot library: search by domain, date, tags, and OCR text.
  *
  * Filtering happens in memory, not via DB indexes: an index answers "equals", the
  * question here is "contains" across five fields at once. One person has thousands of

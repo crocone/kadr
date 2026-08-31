@@ -1,5 +1,5 @@
 /**
- * Guide page (PLAN.md §6.5).
+ * Guide page.
  *
  * A step list, not a canvas: a guide is a sequence, and what needs editing is usually
  * order and captions, not pixels. An individual step opens in the regular editor,

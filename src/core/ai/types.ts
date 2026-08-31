@@ -11,7 +11,7 @@
  *
  * The call is the same; who executes it is the transport's choice: a user's own
  * key goes straight to the provider, server mode will go to the Kadr backend
- * with a task name but without the prompt text (PLAN.md §7).
+ * with a task name but without the prompt text.
  */
 
 /** Where the request goes. `server` arrives with premium, phase 5.5. */

@@ -1,5 +1,5 @@
 /**
- * Capture recipe: everything needed to shoot this same frame again (PLAN.md §6.5).
+ * Capture recipe: everything needed to shoot this same frame again.
  *
  * Written on every capture, including responsive series, and stored right in the
  * document. No separate store, deliberately: a recipe without its document is

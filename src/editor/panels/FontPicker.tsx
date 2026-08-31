@@ -11,7 +11,7 @@ import { useT } from '@/core/ui/app-context'
 import { cn } from '@/core/ui/cn'
 
 /**
- * Font picker with search by name and category (PLAN.md §2).
+ * Font picker with search by name and category.
  * Each list row renders in its own font — a name like "Georgia" doesn't tell you
  * whether it suits the screenshot; the actual glyphs do.
  */

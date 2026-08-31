@@ -6,7 +6,7 @@
  * second: between those moments there is a scroll with its own paint wait, and
  * the header manages to disappear before the next shot. In the reverse order
  * the frame got captured before the repaint, and the header appeared twice
- * (PLAN.md §3).
+ *.
  */
 import { planFullPageCapture } from './plan'
 import type { PageMetrics, StitchPlan } from './types'

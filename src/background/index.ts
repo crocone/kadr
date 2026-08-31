@@ -2,7 +2,7 @@
  * Service worker: hotkeys, context menu, capture orchestration.
  *
  * In MV3 the worker can be suspended at any moment, so this file keeps no state —
- * anything that must survive suspension goes to IndexedDB or chrome.storage.local (PLAN.md §8).
+ * anything that must survive suspension goes to IndexedDB or chrome.storage.local.
  */
 import contentScriptPath from '@/content/index?iife'
 import { CaptureFailure } from '@/core/capture/types'

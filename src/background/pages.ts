@@ -1,6 +1,6 @@
 /**
  * Browser-internal pages cannot be captured — a platform restriction, not our bug.
- * Detect them up front to show a clear message instead of an empty frame (PLAN.md §10).
+ * Detect them up front to show a clear message instead of an empty frame.
  */
 const BLOCKED_SCHEMES = [
   'chrome:',

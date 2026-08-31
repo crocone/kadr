@@ -38,7 +38,7 @@ export type ClientDeps = {
 function checkConfig(config: AiConfig): void {
   if (config.transport === 'server') {
     // The extension point exists, the server does not yet: callers surface this
-    // as "mode unavailable" (PLAN.md §7, phase 5.5).
+    // as "mode unavailable" (phase 5.5).
     throw new AiFailure('not-available')
   }
 

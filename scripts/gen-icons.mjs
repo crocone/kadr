@@ -1,5 +1,5 @@
 /**
- * Icons are drawn in code — no third-party assets in the repo (PLAN.md §9).
+ * Icons are drawn in code — no third-party assets in the repo.
  * The script writes PNGs by hand via zlib to avoid a canvas dependency in devDeps.
  *
  *   node scripts/gen-icons.mjs

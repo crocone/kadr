@@ -1,5 +1,5 @@
 /**
- * Reshoot launched from an extension page (PLAN.md §6.5).
+ * Reshoot launched from an extension page.
  *
  * The host permission is requested here, not in the background, and that's not a style
  * choice: Chrome rejects `permissions.request` outside a user gesture, and a service

@@ -1,6 +1,6 @@
 /**
  * Background palette. Gradients are colour pairs drawn in code — no third-party
- * wallpapers in the repo, ever (PLAN.md §9).
+ * wallpapers in the repo, ever.
  */
 import type { Background, GradientBackground, WallpaperBackground, WallpaperPattern } from './types'
 

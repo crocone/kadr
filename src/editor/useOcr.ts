@@ -30,7 +30,7 @@ export type OcrController = {
  * The capture never leaves: recognition runs in the browser, and the only outbound
  * request is a one-time fetch of the language dictionary. Findings are not redacted
  * automatically: layers are created by a separate click, and until then the person
- * sees the list of findings (PLAN.md §7).
+ * sees the list of findings.
  */
 export function useOcr(
   doc: Doc,
@@ -61,7 +61,7 @@ export function useOcr(
         const image = { w: frame.naturalWidth, h: frame.naturalHeight }
         setFindings(findingsFrom(words, image, frameRect(doc)))
 
-        // Recognized text stays with the document: the library searches by it (PLAN.md §6).
+        // Recognized text stays with the document: the library searches by it.
         // For free: the text is already assembled, and re-running OCR just for search takes minutes.
         controller.setText(words.map((word) => word.text).join(' '))
         setStatus('done')

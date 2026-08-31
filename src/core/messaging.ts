@@ -217,7 +217,7 @@ export type MessageMap = {
     response: FindElementResponse
   }
   /**
-   * Scroll capture (PLAN.md §3). Pick target and direction: whole page or an
+   * Scroll capture. Pick target and direction: whole page or an
    * inner container, down or up through history.
    */
   'content:selectScrollTarget': {
@@ -253,7 +253,7 @@ export type MessageMap = {
     response: { ok: true }
   }
   /**
-   * Reshoot documents from their recipes (PLAN.md §6.5). The initiating page
+   * Reshoot documents from their recipes. The initiating page
    * requests site permission from a user gesture: Chrome rejects
    * `permissions.request` without one, and a service worker can never have a gesture.
    */
@@ -263,7 +263,7 @@ export type MessageMap = {
   }
 
   /**
-   * Scribe: start recording a guide on the active tab (PLAN.md §6.5). The popup
+   * Scribe: start recording a guide on the active tab. The popup
    * requests site permission from a user gesture — without it the recording dies
    * on the first link navigation, when `activeTab` expires.
    */

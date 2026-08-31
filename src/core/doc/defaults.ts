@@ -20,7 +20,7 @@ export function shadowFromPreset(preset: Shadow['preset']): Shadow {
   return { preset, ...SHADOW_PRESETS[preset] }
 }
 
-/** Gradients are generated in code — no third-party wallpapers in the repo (PLAN.md §9). */
+/** Gradients are generated in code — no third-party wallpapers in the repo. */
 export const DEFAULT_BACKGROUND: Background = {
   kind: 'gradient',
   from: '#4f46e5',

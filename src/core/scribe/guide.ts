@@ -1,5 +1,5 @@
 /**
- * The guide as a whole: session, its steps, and operations on them (PLAN.md §6.5).
+ * The guide as a whole: session, its steps, and operations on them.
  *
  * Steps live in their own store; step documents are regular library documents. This is
  * the glue: build a step's doc on demand, return steps in order, and delete a guide

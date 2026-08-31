@@ -1,5 +1,5 @@
 /**
- * Recording timeline: what the user did, where, and when (PLAN.md §6.5).
+ * Recording timeline: what the user did, where, and when.
  *
  * One type serves two phases. Scribe records clicks and input; phase 7 will add scroll
  * and cursor to the same steps and get an auto-zoom timeline without rewriting a line.

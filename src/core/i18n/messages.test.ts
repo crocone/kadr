@@ -8,7 +8,7 @@ const placeholders = (template: string): string[] =>
 
 /**
  * Half the audience arrives via Yandex Browser, so Russian is a first-class language
- * here, not an afterthought (PLAN.md §9). A forgotten key falls back to the English
+ * here, not an afterthought. A forgotten key falls back to the English
  * string and just looks unfinished in the UI — this test catches that.
  */
 describe('messages', () => {

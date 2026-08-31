@@ -8,7 +8,7 @@
  * Proportions derive from the capture width instead of fixed pixels: a 44 px bar
  * looks like a thread on a 2560 px shot and like half the picture on a 400 px one.
  *
- * Frames are drawn in code. No third-party mockups in the repo, ever (PLAN.md §9):
+ * Frames are drawn in code. No third-party mockups in the repo, ever:
  * device bodies are someone else's industrial designs and images, and a rounded
  * rectangle of the right proportions is enough here.
  */
@@ -196,7 +196,7 @@ export function displayUrl(url: string, domain: string | null): string {
  * Favicon letter and colour, derived from the address.
  *
  * A real site icon would have to be fetched from the network, and the extension
- * doesn't go online (PLAN.md §9). A domain letter in a coloured square reads just
+ * doesn't go online. A domain letter in a coloured square reads just
  * as well and doesn't lie: it's obviously drawn, not passed off as the real icon.
  */
 export function faviconFor(url: string): { letter: string; color: string } {

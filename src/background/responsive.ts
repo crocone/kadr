@@ -4,7 +4,7 @@
  * The width is set through the browser window, not by faking metrics:
  * `chrome.windows.update` really changes the viewport, so media queries, container
  * queries and lazy images behave exactly as for a visitor with that screen. Faking
- * that would take CDP, which was ruled out (PLAN.md §12).
+ * that would take CDP, which was ruled out.
  *
  * The price: the window visibly changes size for a couple of seconds. There is no
  * hiding it, so what matters is that the original size is always restored, including

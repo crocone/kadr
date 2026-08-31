@@ -6,7 +6,7 @@
  * because providers differ, and the caller ultimately needs bytes.
  *
  * No wording of our own: the user writes the instruction, the extension
- * delivers the frame (PLAN.md §7).
+ * delivers the frame.
  */
 import { AiFailure, type AiConfig } from './types'
 

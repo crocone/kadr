@@ -6,7 +6,7 @@ import type { PageMetrics, StitchPlan, StitchStep } from './types'
 /**
  * Chrome allows at most two captureVisibleTab frames per second, so we keep
  * 550 ms between frames: 500 is the limit itself, the rest is timer-jitter
- * headroom (PLAN.md §10).
+ * headroom.
  */
 export const CAPTURE_INTERVAL_MS = 550
 

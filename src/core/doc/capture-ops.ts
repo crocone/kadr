@@ -195,7 +195,7 @@ export function setCaptureImage(
 
 /**
  * Re-capture: the new frame takes the old one's place, and the old one goes into
- * document history (PLAN.md §6.5).
+ * document history.
  *
  * The capture grows from its top-left corner, not its centre: it stays exactly
  * where it stood, and nearby annotations don't drift apart. Their coordinates are

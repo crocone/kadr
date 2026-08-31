@@ -3,7 +3,7 @@
  *
  * These are system families for now, not bundled files. The reason is simple: bundled
  * fonts in an open repository must be OFL-licensed and listed in LICENSES.md alongside
- * their files (PLAN.md §9), while system fonts require nothing and are always there.
+ * their files, while system fonts require nothing and are always there.
  * An OFL font set will be added with its licenses as a separate step.
  */
 export type FontOption = { label: string; value: string }

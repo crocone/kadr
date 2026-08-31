@@ -266,7 +266,7 @@ export function Workspace({ stored }: { stored: StoredDoc }) {
 
   /**
    * Image from the clipboard. The extension must work without page capture too:
-   * copy anything, paste, edit (PLAN.md §4).
+   * copy anything, paste, edit.
    */
   const pasteImage = async () => {
     if (!navigator.clipboard.read) return
@@ -476,7 +476,7 @@ export function Workspace({ stored }: { stored: StoredDoc }) {
     <div
       className="flex h-dvh flex-col"
       // A file dropped on the editor opens as an image — no page capture required
-      // (PLAN.md §4). Without preventDefault the browser would just open the image.
+      //. Without preventDefault the browser would just open the image.
       onDragOver={(event) => {
         if (event.dataTransfer.types.includes('Files')) event.preventDefault()
       }}

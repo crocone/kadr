@@ -19,7 +19,7 @@ const PRESET_FILE = 'kadr-style-presets.json'
 
 /**
  * Style presets: save a look under a name and apply it in one click, plus JSON
- * import/export for sharing with a team (PLAN.md §4).
+ * import/export for sharing with a team.
  *
  * Presets live in IndexedDB next to documents, not in settings: there can be dozens,
  * and chrome.storage.local is the wrong place for that volume.

@@ -16,7 +16,7 @@
  * regex, so they are fixed up before matching (`normalizeDigitRuns`).
  *
  * This module deals only in text and offsets within it. Turning matches into
- * blur layers is for whoever knows where the text sat on the image (PLAN.md §7).
+ * blur layers is for whoever knows where the text sat on the image.
  */
 export type PiiKind =
   'email' | 'phone' | 'card' | 'iban' | 'jwt' | 'apiKey' | 'ip' | 'snils' | 'ssn' | 'vat'

@@ -1,5 +1,5 @@
 /**
- * Grid to CSV, Markdown, and JSON (PLAN.md §6.5).
+ * Grid to CSV, Markdown, and JSON.
  *
  * Input is a rectangular grid of strings — `colspan`/`rowspan` already expanded,
  * service labels already stripped. Only formatting happens here, no DOM access: all

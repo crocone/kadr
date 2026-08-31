@@ -1,5 +1,5 @@
 /**
- * Guide-recording orchestration (PLAN.md §6.5).
+ * Guide-recording orchestration.
  *
  * Everything the page cannot do lives here: capturing the tab frame, the
  * two-frames-per-second limiter, writing steps to the database, surviving navigation.

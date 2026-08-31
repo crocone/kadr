@@ -3,7 +3,7 @@
  *
  * Host permission is requested here, right before the first request: the base build
  * ships without host-permissions, and tracker origins are requested at send time
- * (PLAN.md §8). Chrome grants such permission only on a user gesture — and sending
+ *. Chrome grants such permission only on a user gesture — and sending
  * to a ticket starts with exactly one.
  */
 import { github } from './github'

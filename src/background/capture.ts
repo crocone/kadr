@@ -3,7 +3,7 @@
  * made here; core/capture assembles the pixels, the content script prepares the page.
  *
  * The MV3 service worker can be suspended, so results go straight to IndexedDB and the
- * editor tab is opened by document id (PLAN.md §8).
+ * editor tab is opened by document id.
  */
 import {
   CAPTURE_INTERVAL_MS,
@@ -335,7 +335,7 @@ const MAX_ROLL_FRAMES = 240
 const EDGE_MARGIN_PX = 48
 
 /**
- * Scrolling capture: frames are stitched by content, not by scroll position (PLAN.md §3).
+ * Scrolling capture: frames are stitched by content, not by scroll position.
  *
  * The key difference from `fullPage`: there a plan is computed from the page height,
  * here there is no height at all. A virtualized list does not say how many rows it has

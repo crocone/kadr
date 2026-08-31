@@ -11,7 +11,7 @@
  * entry/exit points are added at the cut — the edge lands where the cursor went.
  *
  * The eraser never touches the shot's own pixels: Kadr edits are non-destructive
- * (PLAN.md §4).
+ *.
  */
 import { newLayerId } from './ids'
 import type { Doc, DrawLayer, Layer, Point } from './types'

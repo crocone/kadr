@@ -5,8 +5,8 @@ import pkg from './package.json' with { type: 'json' }
 /**
  * The base permission set is deliberately narrow: `activeTab` is granted on icon
  * click, context-menu item, and hotkey — which covers every capture entry point.
- * Heavy permissions (`tabCapture`, `desktopCapture`, `<all_urls>`) live in optional_*
- * and are requested only when the corresponding mode is enabled. See PLAN.md §8.
+ * The one heavy thing left is host access: it is optional, and it is asked for one
+ * site at a time, at the moment a button actually needs it.
  */
 export default defineManifest({
   manifest_version: 3,
@@ -52,13 +52,13 @@ export default defineManifest({
   ],
 
   // `debugger` cannot go here: Chrome answers "cannot be listed as optional" and
-  // silently drops it from the manifest. So the high-fidelity mode from PLAN.md §3
+  // silently drops it from the manifest. So the high-fidelity mode
   // must either be a required permission with an install-time warning or not exist —
   // to be decided in phase 4; until then it's absent.
   //
   // There is no `optional_permissions` at all in v1.0, and that is deliberate. `tabCapture`
   // and `desktopCapture` belong to the recorder, which is phase 7 and ships as a separate
-  // update to an already-approved extension (PLAN.md §11); `tabs` belongs to the multi-tab
+  // update to an already-approved extension; `tabs` belongs to the multi-tab
   // batch capture, which is not written either. An optional permission that no call site
   // ever requests is a question at review with no answer behind it — and for these two
   // in particular, the answer costs weeks of moderation.
@@ -71,7 +71,7 @@ export default defineManifest({
    *
    * The name is scary but the grant is narrow: it allows executing wasm and nothing
    * else — `unsafe-eval` with its `eval()` and strings-as-code stays forbidden. The
-   * only module compiled is the one shipped inside the package (PLAN.md §7).
+   * only module compiled is the one shipped inside the package.
    */
   content_security_policy: {
     extension_pages: "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'",

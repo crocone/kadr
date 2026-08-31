@@ -1,6 +1,6 @@
 /**
  * Document model. Both the preview and the export render from it — which removes
- * the whole class of "screen says one thing, file says another" bugs (PLAN.md §8).
+ * the whole class of "screen says one thing, file says another" bugs.
  *
  * Layers and canvas fields are deliberately wider than the current phase can use:
  * the type is a contract between phases, and adding a field later costs a storage
@@ -27,7 +27,7 @@ export type ImageBackground = { kind: 'image'; imageId: ImageId; fit: 'cover' | 
 
 /**
  * Wallpapers are drawn in code from a colour pair: the pattern is a type, not an
- * image file. No third-party wallpapers in the repo, ever (PLAN.md §9), so there's
+ * image file. No third-party wallpapers in the repo, ever, so there's
  * nothing to store — a pattern name and two colours suffice.
  */
 export type WallpaperPattern = 'mesh' | 'dots' | 'grid' | 'stripes' | 'rings'
@@ -204,7 +204,7 @@ export type ImageLayer = LayerBase & {
 }
 export type EmojiLayer = LayerBase & { kind: 'emoji'; at: Point; emoji: string; size: number }
 
-/** Blur is a layer, not burned-in pixels: it can be moved or removed later (PLAN.md §4). */
+/** Blur is a layer, not burned-in pixels: it can be moved or removed later. */
 export type BlurLayer = LayerBase & {
   kind: 'blur'
   rect: Rect

@@ -3,7 +3,7 @@
  *
  * The engine and wasm ship in the bundle — no way around it, MV3 forbids executing
  * remotely loaded code. Language data is downloaded on first use: `eng` plus `rus`
- * weigh nearly 25 MB, a bad deal to bundle for users who never open OCR (PLAN.md §7).
+ * weigh nearly 25 MB, a bad deal to bundle for users who never open OCR.
  *
  * The frame itself never leaves the browser: recognition happens here, and the only
  * network request is for the language data.

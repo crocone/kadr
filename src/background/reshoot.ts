@@ -1,6 +1,6 @@
 /**
  * Reshooting from a recipe: refresh a document's frame without recapturing by hand
- * (PLAN.md §6.5).
+ *.
  *
  * Everything is shot in a dedicated window, not in the user's tab. The reason is
  * technical and hard: `captureVisibleTab` shoots the window's active tab, so a batch of

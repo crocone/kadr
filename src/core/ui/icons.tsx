@@ -3,7 +3,7 @@ import type { SVGProps } from 'react'
 /**
  * UI icons. Drawn in code to match the design language: 1.5 stroke, round caps,
  * 20×20 grid — so the set looks like a set, not scavenged symbols. No third-party
- * icon fonts or sprites in the repo (PLAN.md §9).
+ * icon fonts or sprites in the repo.
  */
 export type IconProps = SVGProps<SVGSVGElement> & { size?: number }
 

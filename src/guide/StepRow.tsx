@@ -3,7 +3,7 @@
  *
  * Reordering uses up/down buttons instead of drag-and-drop: buttons work from the
  * keyboard, lists are tens of rows at most, and DnD would mean pulling in a library
- * and losing accessibility (PLAN.md §9).
+ * and losing accessibility.
  */
 import { useEffect, useState } from 'react'
 

@@ -3,7 +3,7 @@
  *
  * System fonts only — each described as a stack with fallbacks for all three
  * platforms. No network involved: the extension loads nothing external
- * (PLAN.md §9), and Google Fonts weights would drag in both requests and
+ *, and Google Fonts weights would drag in both requests and
  * licences.
  *
  * Categories and search come from checklist §2: with this many fonts, choosing

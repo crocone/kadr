@@ -1,5 +1,5 @@
 /**
- * Records user actions on the page (PLAN.md §6.5).
+ * Records user actions on the page.
  *
  * The one rule: the page must keep working. Listeners sit in the capture phase but
  * intercept nothing — no `preventDefault`, no `stopPropagation`. A recording that

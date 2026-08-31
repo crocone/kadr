@@ -1,6 +1,6 @@
 /**
  * Screenshot straight into a ticket: GitHub, Linear, or Jira with the user's token
- * (PLAN.md §6).
+ *.
  *
  * Three trackers, three different protocols — no shared "single endpoint" like in the
  * AI layer. What is shared: each uploads the image first, then creates an issue

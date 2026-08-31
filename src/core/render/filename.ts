@@ -1,5 +1,5 @@
 /**
- * Meaningful filename instead of `screenshot(3).png` (PLAN.md §6).
+ * Meaningful filename instead of `screenshot(3).png`.
  * The template is configured in options; fields are domain, page title and date.
  */
 export type FilenameFields = {

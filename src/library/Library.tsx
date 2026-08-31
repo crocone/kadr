@@ -37,7 +37,7 @@ const RENAME_DEBOUNCE_MS = 500
 type View = 'grid' | 'list'
 
 /**
- * Shot library: search by domain, date, tags, and OCR text (PLAN.md §6).
+ * Shot library: search by domain, date, tags, and OCR text.
  *
  * All documents are loaded once and filtered in memory: search must respond to every
  * keystroke, and a trip to IndexedDB per letter cannot deliver that.

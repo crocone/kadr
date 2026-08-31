@@ -2,11 +2,11 @@
  * Minimal PDF writer: pages with one image each.
  *
  * Hand-written rather than a library, for the same reason video will go through
- * WebCodecs instead of ffmpeg.wasm (PLAN.md §5): only one object type is needed —
+ * WebCodecs instead of ffmpeg.wasm: only one object type is needed —
  * JPEG via DCTDecode, embedded byte-for-byte without re-encoding. A couple hundred
  * lines versus a megabyte of dependency.
  *
- * A long capture is cut into pages, not emitted as one huge image (PLAN.md §3).
+ * A long capture is cut into pages, not emitted as one huge image.
  */
 export type PageSize = { w: number; h: number }
 

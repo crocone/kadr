@@ -1,5 +1,5 @@
 /**
- * Guide annotation styling (PLAN.md §6.5).
+ * Guide annotation styling.
  *
  * The panel sits above the step list rather than in global settings: an internal guide
  * and a client-facing one are styled differently, and flipping a global setting between

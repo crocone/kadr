@@ -1,6 +1,6 @@
 /**
  * History is a stack of whole-document snapshots, not commands: undo/redo works
- * the same for drawing and for a background change (PLAN.md §8). Snapshots are
+ * the same for drawing and for a background change. Snapshots are
  * cheap because `Doc` holds no pixels — only a reference to the capture in IndexedDB.
  */
 export type History<T> = {

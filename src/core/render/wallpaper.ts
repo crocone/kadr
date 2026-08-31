@@ -1,6 +1,6 @@
 /**
  * Wallpapers are generated in code: a pattern is a formula, not an image in the repo
- * (PLAN.md §9). Hence the model — pattern name plus two colours, no files or licences.
+ *. Hence the model — pattern name plus two colours, no files or licences.
  *
  * Repeating patterns are tiled: one small tile instead of a twenty-thousand-pixel
  * canvas. The tile is drawn at 2x and scaled down when laid — so a 2x export stays

@@ -18,7 +18,7 @@ const input =
 
 /**
  * Tracker tokens. Stored in `chrome.storage.local` next to the AI key, for the same
- * reason: in `sync` they would end up in Google's cloud (PLAN.md §7).
+ * reason: in `sync` they would end up in Google's cloud.
  *
  * Trackers are shown one at a time: three field sets at once are a wall that hides
  * which one is actually configured.

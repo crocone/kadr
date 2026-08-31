@@ -2,7 +2,7 @@
  * State of the document being edited.
  *
  * History is a stack of whole-`Doc` snapshots, not commands: undo/redo works the same
- * for drawing and for a shadow slider (PLAN.md §8).
+ * for drawing and for a shadow slider.
  *
  * A continuous gesture — a drag, a slider move — must become one undo step. So the
  * gesture's first `edit` pushes the pre-edit state into history, and later ones just

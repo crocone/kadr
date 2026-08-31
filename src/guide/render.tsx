@@ -1,5 +1,5 @@
 /**
- * Offscreen document rendering (PLAN.md §6.5).
+ * Offscreen document rendering.
  *
  * A guide is exported as a whole — ten steps to markdown, PDF, or one long image — and
  * there is no live editor here to render them in. So the scene is assembled in a

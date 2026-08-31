@@ -14,7 +14,7 @@ import {
 } from '@/core/ui/icons'
 
 /**
- * Onboarding: opens once, on install (PLAN.md §11, phase 6).
+ * Onboarding: opens once, on install (phase 6).
  *
  * Only what users won't find on their own: the four capture modes with hotkeys, the
  * privacy promise, and the way to settings. No editor tour — the editor explains

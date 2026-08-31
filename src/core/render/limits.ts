@@ -1,7 +1,7 @@
 /**
  * Chrome canvas limits: roughly 268M pixels of area and 65,535 per side. We keep a
  * margin — better to hit the limit honestly and say so than get an empty frame
- * (PLAN.md §10).
+ *.
  */
 export const MAX_CANVAS_SIDE = 32_767
 export const MAX_CANVAS_AREA = 178_956_970

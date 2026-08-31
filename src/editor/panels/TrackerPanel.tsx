@@ -10,7 +10,7 @@ import { Chip } from '@/core/ui/controls'
 import type { TrackerController } from '../useTracker'
 
 /**
- * Screenshot straight to a ticket: title, description, and a button (PLAN.md §6).
+ * Screenshot straight to a ticket: title, description, and a button.
  *
  * Page context (URL, browser, resolution) is appended automatically, so the panel
  * has no fields for it: nobody fills those in by hand, yet a bug report needs them.

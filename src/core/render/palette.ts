@@ -1,6 +1,6 @@
 /**
  * Background picking from the frame's colours. Computed locally from a histogram:
- * no network, no API key, yet it feels "smart" (PLAN.md §7).
+ * no network, no API key, yet it feels "smart".
  *
  * Near-white and near-black are dropped on purpose: most pages are white, and without
  * this every pick would yield the same grey gradient.

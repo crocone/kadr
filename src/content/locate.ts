@@ -1,5 +1,5 @@
 /**
- * Finds a recorded element on a freshly opened page (PLAN.md §6.5).
+ * Finds a recorded element on a freshly opened page.
  *
  * Both re-capture and Scribe use this, and both need an honest answer — a rect in
  * page coordinates or "not found" — never "something similar". A silent substitute is

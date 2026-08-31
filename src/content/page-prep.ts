@@ -2,7 +2,7 @@
  * Prepares the page for a series of frames. Every change is reversible: the original
  * inline style is remembered and restorePage() puts the page back as it was.
  *
- * What gets neutralised and why (PLAN.md §3, §10):
+ * What gets neutralised and why:
  * — animations and transitions: adjacent frames would drift out of phase;
  * — smooth scrolling: `scrollTo` would report an intermediate position;
  * — `background-attachment: fixed`: parallax smears across the frames;

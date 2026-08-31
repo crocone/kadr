@@ -2,7 +2,7 @@
  * Shot context for the issue body: page URL, browser, and screen resolution.
  *
  * Exactly the three lines a screenshot bug report usually lacks, and exactly the ones
- * nobody types by hand (PLAN.md §6). Collected here, not in the panel: the issue body
+ * nobody types by hand. Collected here, not in the panel: the issue body
  * is identical for all three trackers.
  */
 

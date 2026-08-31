@@ -42,7 +42,7 @@ export function coverRect(
  *
  * Needed by blur and redaction: they live in document coordinates, but pixels are cut
  * from the frame, which keeps its own resolution and is drawn scaled. That way blur
- * stays a layer on top of the frame, not a hole burned into it (PLAN.md §4).
+ * stays a layer on top of the frame, not a hole burned into it.
  */
 export function documentRectToImageRect(
   region: { x: number; y: number; w: number; h: number },

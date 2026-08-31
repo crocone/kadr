@@ -3,7 +3,7 @@
  *
  * The extension does not know prices — each provider has its own and they change
  * — so it counts tokens and requests, not money. Lying with an exact sum is worse
- * than honest numbers that show where it all goes (PLAN.md §7).
+ * than honest numbers that show where it all goes.
  */
 import type { AiUsage } from './types'
 

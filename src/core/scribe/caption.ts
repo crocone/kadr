@@ -1,5 +1,5 @@
 /**
- * Guide step caption (PLAN.md §6.5).
+ * Guide step caption.
  *
  * Built from two halves: the element's name and what it is. The name comes from the
  * same places a screen reader looks — `aria-label`, `title`, `alt`, visible text,

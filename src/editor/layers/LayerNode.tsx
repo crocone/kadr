@@ -365,7 +365,7 @@ function SpotlightNode({ layer, canvas, common }: LayerNodeProps & { common: Com
 /**
  * Blur and pixelation as a layer: a piece of the capture is cut out and drawn on top
  * with a filter. The layer can be moved, weakened, or removed an hour later — the
- * pixels underneath stay intact (PLAN.md §4).
+ * pixels underneath stay intact.
  */
 function BlurNode({
   layer,

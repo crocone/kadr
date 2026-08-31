@@ -1,5 +1,5 @@
 /**
- * Builds a step into a regular document (PLAN.md §6.5).
+ * Builds a step into a regular document.
  *
  * No new layer kinds: the element outline is a `shape`, the number a `badge`, the
  * caption a `text`. The editor already knows how to move, recolor, and export all of

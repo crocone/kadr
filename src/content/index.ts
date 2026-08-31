@@ -1,7 +1,7 @@
 /**
  * Content script: selection overlays, page metrics, scroll control.
  * Injected on demand under `activeTab` — declarative content_scripts would require
- * host permissions at install time (PLAN.md §8).
+ * host permissions at install time.
  */
 import { registerMessageHandlers } from '@/core/messaging'
 

@@ -28,7 +28,7 @@ export type ToolSpec = {
   tool: Tool
   gesture: ToolGesture
   kind: LayerKind | null
-  /** One key per tool (PLAN.md §4). */
+  /** One key per tool. */
   key: string
 }
 

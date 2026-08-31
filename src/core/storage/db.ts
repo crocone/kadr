@@ -1,6 +1,6 @@
 /**
  * IndexedDB holds frame blobs, documents, and presets. The MV3 service worker gets
- * suspended, so state never lives in its memory (PLAN.md §8).
+ * suspended, so state never lives in its memory.
  */
 import { type DBSchema, type IDBPDatabase, openDB } from 'idb'
 
@@ -9,7 +9,7 @@ import type { Doc, DocId, ImageId } from '@/core/doc/types'
 import type { GuideId, ScribeSession, ScribeStep, StepId } from '@/core/scribe/timeline'
 
 export const DB_NAME = 'kadr'
-/** 2 — Scribe: recorded steps and built guides (PLAN.md §6.5). */
+/** 2 — Scribe: recorded steps and built guides. */
 export const DB_VERSION = 2
 
 export type StoredImage = {
@@ -24,7 +24,7 @@ export type StoredImage = {
 }
 
 /**
- * Named "background + shadow + border + padding + radius" bundle (PLAN.md §4).
+ * Named "background + shadow + border + padding + radius" bundle.
  * What a style contains is decided (and parsed) by `core/doc/style-presets`.
  */
 export type StoredPreset = StylePreset

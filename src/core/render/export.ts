@@ -3,8 +3,8 @@
  *
  * Draws the same scene as the preview, not a separate "export" renderer: for the
  * capture the stage temporarily switches to document scale and offset and renders
- * itself whole. That is the PLAN.md §8 promise — the file contains exactly what is on
- * screen; a second renderer would eventually drift from the first.
+ * itself whole. That is the whole point — the file contains exactly what is on screen;
+ * a second renderer would eventually drift from the first.
  */
 import type Konva from 'konva'
 

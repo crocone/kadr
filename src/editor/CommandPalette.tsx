@@ -13,7 +13,7 @@ export type Command = {
 }
 
 /**
- * Command palette on Ctrl+K (PLAN.md §4).
+ * Command palette on Ctrl+K.
  *
  * Search matches title and group, because "arrow" is looked up both as a tool and
  * via the word "annotations". Substring matching, no fuzzy search: the list is

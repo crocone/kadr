@@ -1,6 +1,6 @@
 /**
  * On-demand content-script injection under `activeTab` — declarative `content_scripts`
- * would require host permissions at install time (PLAN.md §8).
+ * would require host permissions at install time.
  *
  * The subtlety that made the very first capture fail with "Receiving end does not
  * exist": CRXJS injects not the module itself but a loader that pulls it in via dynamic

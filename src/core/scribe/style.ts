@@ -1,5 +1,5 @@
 /**
- * Guide annotation styling (PLAN.md §6.5).
+ * Guide annotation styling.
  *
  * The style lives on the guide, not in global settings: an internal-panel guide and a
  * customer-facing one are styled differently, and toggling a global setting between

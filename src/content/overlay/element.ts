@@ -10,7 +10,7 @@
  * below the fold, and the background decides whether to scroll or stitch.
  *
  * When the cursor is over a table, "copy as" chips appear next to the frame
- * (PLAN.md §6.5). Not a separate capture mode: the user is already hovering elements,
+ *. Not a separate capture mode: the user is already hovering elements,
  * and a table is just another outcome of the same pick — as text instead of a shot.
  */
 import { refOf } from '@/core/dom/selector'

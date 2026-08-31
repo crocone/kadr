@@ -9,7 +9,7 @@
  *
  * Shapes only — rects, circles, text. No third-party images: device bodies are
  * someone else's industrial designs, and a rounded rectangle with the right
- * proportions reads as a phone just as well (PLAN.md §9).
+ * proportions reads as a phone just as well.
  */
 import type Konva from 'konva'
 

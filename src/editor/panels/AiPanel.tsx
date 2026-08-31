@@ -25,7 +25,7 @@ import type { DocumentController } from '../useDocument'
  * User-defined prompts, runnable against the current frame.
  *
  * No built-in prompts here by design: with their own API key users write their own,
- * and ours ship server-side with premium (PLAN.md §7). The examples shown for an
+ * and ours ship server-side with premium. The examples shown for an
  * empty list are templates, not features — clearly drafts, editable before running.
  */
 export function AiPanel({
@@ -148,7 +148,7 @@ export function AiPanel({
  *
  * The result lands as a separate layer on top of the original, not in place of it:
  * models make mistakes, and being able to compare and revert is worth one extra
- * layer (PLAN.md §7).
+ * layer.
  */
 function ImageEdit({ ai, onAdded }: { ai: AiController; onAdded: (blob: Blob) => Promise<void> }) {
   const t = useT()

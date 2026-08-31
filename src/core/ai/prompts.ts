@@ -3,7 +3,7 @@
  *
  * On their own key the user writes requests themselves: name, text, output kind.
  * Ready-made prompts are part of premium and live on the server, not in the
- * open-source extension code (PLAN.md §7).
+ * open-source extension code.
  *
  * Prompts live in `chrome.storage.local`: they are a setting, not a document,
  * and have no reason to travel to Google's cloud via sync.

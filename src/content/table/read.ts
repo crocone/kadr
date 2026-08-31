@@ -1,5 +1,5 @@
 /**
- * Reads a page table into a rectangular grid (PLAN.md §6.5).
+ * Reads a page table into a rectangular grid.
  *
  * Two jobs, both non-obvious.
  *

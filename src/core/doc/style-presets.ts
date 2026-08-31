@@ -1,6 +1,6 @@
 /**
  * Style presets: "background + shadow + frame + padding + radius" under a name,
- * one click, shareable as JSON (PLAN.md §4).
+ * one click, shareable as JSON.
  *
  * Only canvas styling goes into a preset. Anything referencing the local
  * database — image backgrounds and custom mockups — is excluded on purpose:

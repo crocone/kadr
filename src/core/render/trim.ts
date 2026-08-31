@@ -1,7 +1,7 @@
 /**
  * Trimming empty margins: how much uniform edge can be cut without losing anything.
  *
- * Computed locally from pixels — no network, key, or model (PLAN.md §7). Works on a
+ * Computed locally from pixels — no network, key, or model. Works on a
  * downscaled copy and returns bounds as fractions: at full resolution the same pass
  * would cost tens of millions of comparisons, and margins don't depend on scale.
  */

@@ -4,8 +4,9 @@ import manifestExport from '../../manifest.config'
 
 /**
  * Permissions are a design decision, not an implementation detail: the base build lives
- * on `activeTab`, everything heavy sits in optional_* (PLAN.md §8). The test pins this
- * property because "just add a host" is the easiest way to make store review heavier.
+ * on `activeTab`, and the only heavy thing it can ask for is host access, one site at a
+ * time. The test pins this property because "just add a host" is the easiest way to make
+ * store review heavier.
  */
 const manifest = manifestExport as unknown as chrome.runtime.ManifestV3
 
@@ -22,7 +23,7 @@ describe('manifest', () => {
   /**
    * v1.0 ships without the recorder, so it ships without the permissions the recorder
    * would need — in either list. Declaring them early costs a heavier first review and
-   * buys nothing, because no call site requests them (PLAN.md §11). Phase 7 puts
+   * buys nothing, because no call site requests them. Phase 7 puts
    * `tabCapture` and `desktopCapture` back into optional_*, and the batch capture puts
    * `tabs` there; until then this test is what keeps them out.
    */

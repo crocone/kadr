@@ -1,5 +1,5 @@
 /**
- * Pointer to the recording in progress (PLAN.md §6.5).
+ * Pointer to the recording in progress.
  *
  * Lives in `chrome.storage.session` — not in worker memory and not in IndexedDB.
  * Memory won't do: MV3 suspends the service worker mid-recording, and a revived

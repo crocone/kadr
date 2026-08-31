@@ -52,7 +52,7 @@ async function build(): Promise<void> {
 
 /**
  * Menu items are one of the entry points granting `activeTab`, which is how the base
- * build gets by without host permissions (PLAN.md §8).
+ * build gets by without host permissions.
  *
  * Builds are queued, not run in parallel. On a browser update `onInstalled` and
  * `onStartup` arrive almost simultaneously, and two calls used to interleave: both

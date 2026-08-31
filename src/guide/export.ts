@@ -1,5 +1,5 @@
 /**
- * Guide export (PLAN.md §6.5).
+ * Guide export.
  *
  * No new dependencies. Markdown is text plus an image folder via `chrome.downloads`:
  * the subfolder comes from the filename — there is no dedicated API for it, and none is

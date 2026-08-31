@@ -1,5 +1,5 @@
 /**
- * Sending the capture to a tracker: GitHub, Linear, or Jira with the user's token (PLAN.md §6).
+ * Sending the capture to a tracker: GitHub, Linear, or Jira with the user's token.
  *
  * The same image as export goes out — the composed canvas, not the raw capture:
  * redacted content must stay redacted in the issue too.

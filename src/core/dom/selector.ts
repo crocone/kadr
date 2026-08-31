@@ -1,6 +1,6 @@
 /**
  * Element selector plus fingerprint: how re-capture and Scribe find the same node
- * on a freshly opened page (PLAN.md §6.5).
+ * on a freshly opened page.
  *
  * The preference order is about lifespan, not elegance. A human-written `id`
  * survives markup and theme changes — but a framework-generated one changes on
