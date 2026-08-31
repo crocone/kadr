@@ -10,7 +10,7 @@ const ITEMS: { id: string; mode: CaptureMode; title: Record<'en' | 'ru', string>
   {
     id: 'capture-scroll',
     mode: 'scroll',
-    title: { en: 'Scrolling capture', ru: 'Снять со скроллом' },
+    title: { en: 'Capture a chat or feed', ru: 'Снять чат или ленту' },
   },
 ]
 

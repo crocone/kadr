@@ -217,6 +217,10 @@ export function Popup() {
               key={mode}
               type="button"
               disabled={busy}
+              // The card has room for a name and a hotkey, not for a sentence — and the
+              // hint explaining what the mode actually does was written and then never
+              // shown. A tooltip is where it fits without growing the popup.
+              title={t(label.hint)}
               onClick={() => {
                 capture(mode)
               }}

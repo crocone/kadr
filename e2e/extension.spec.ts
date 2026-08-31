@@ -69,7 +69,7 @@ test('the popup offers every capture mode and the way to the library', async ({
     'Visible area',
     'Select area',
     'Pick element',
-    'Scrolling capture',
+    'Capture a chat or feed',
   ]) {
     await expect(page.getByText(label, { exact: true })).toBeVisible()
   }
@@ -86,7 +86,7 @@ test('the scrolling capture ships without a default shortcut, and says so', asyn
   const page = await context.newPage()
   await page.goto(pageUrl(extensionId, 'popup'))
 
-  await expect(page.getByRole('button', { name: 'Scrolling capture Not set' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Capture a chat or feed Not set' })).toBeVisible()
 })
 
 test('the welcome page explains the hotkeys', async ({ context, extensionId }) => {

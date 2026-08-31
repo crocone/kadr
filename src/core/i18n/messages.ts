@@ -20,7 +20,7 @@ export const messages = {
     'capture.visible.hint': 'What you see right now',
     'capture.area.hint': 'Drag a rectangle',
     'capture.element.hint': 'Hover and click a DOM element',
-    'capture.scroll': 'Scrolling capture',
+    'capture.scroll': 'Capture a chat or feed',
     'capture.scroll.hint': 'A chat or a feed: the shot grows while it scrolls',
     'capture.unsupportedPage':
       'This page cannot be captured: browser and Web Store pages are off limits.',
@@ -242,6 +242,7 @@ export const messages = {
     'guide.redacted': 'Covered {n} findings across the guide',
     'guide.redact.none':
       'Nothing with a recognisable shape turned up — an address, a phone, a card, a token. Names and titles have no shape to match: cover those by hand in the editor.',
+    'guide.export': 'Export',
     'guide.style': 'Marking',
     'guide.style.accent': 'Colour',
     'guide.style.outline': 'Outline',
@@ -603,7 +604,7 @@ export const messages = {
     'capture.visible.hint': 'То, что видно сейчас',
     'capture.area.hint': 'Растянуть прямоугольник',
     'capture.element.hint': 'Навести и кликнуть по элементу',
-    'capture.scroll': 'Снять со скроллом',
+    'capture.scroll': 'Снять чат или ленту',
     'capture.scroll.hint': 'Чат или лента: кадр растёт, пока идёт прокрутка',
     'capture.unsupportedPage':
       'Эту страницу снять нельзя: служебные страницы браузера и Web Store недоступны.',
@@ -823,6 +824,7 @@ export const messages = {
     'guide.redacted': 'Замазано находок по всей инструкции: {n}',
     'guide.redact.none':
       'Ничего с узнаваемой формой не нашлось — почты, телефона, карты, токена. Имена и названия формы не имеют: их закрывают плашкой вручную в редакторе.',
+    'guide.export': 'Выгрузка',
     'guide.style': 'Маркировка',
     'guide.style.accent': 'Цвет',
     'guide.style.outline': 'Рамка',
