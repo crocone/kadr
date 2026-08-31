@@ -16,6 +16,7 @@ import { useObjectUrl } from '@/core/ui/useObjectUrl'
 export function StepRow({
   step,
   startsPage,
+  preview,
   onCaption,
   onCaptionDone,
   onMove,
@@ -25,6 +26,8 @@ export function StepRow({
   step: ScribeStep
   /** First step on a new page: a divider with the URL is drawn above it. */
   startsPage: boolean
+  /** Step drawn with its annotations. Null until it is ready. */
+  preview: Blob | null
   onCaption: (caption: string) => void
   onCaptionDone: (caption: string) => void
   onMove: (delta: number) => void
@@ -32,14 +35,16 @@ export function StepRow({
   onOpen: () => void
 }) {
   const t = useT()
-  const [blob, setBlob] = useState<Blob | null>(null)
-  const thumbnail = useObjectUrl(blob)
+  const [frame, setFrame] = useState<Blob | null>(null)
+  // The bare frame stands in until the annotated preview arrives, so the list never
+  // blinks empty while a style change is being redrawn.
+  const thumbnail = useObjectUrl(preview ?? frame)
 
   useEffect(() => {
     if (!step.imageId) return
     let cancelled = false
     void getImage(step.imageId).then((image) => {
-      if (!cancelled) setBlob(image?.blob ?? null)
+      if (!cancelled) setFrame(image?.blob ?? null)
     })
     return () => {
       cancelled = true
@@ -66,10 +71,11 @@ export function StepRow({
           title={t('guide.open')}
           disabled={!thumbnail}
           onClick={onOpen}
-          className="h-16 w-28 shrink-0 overflow-hidden rounded-control border border-border bg-surface-muted disabled:cursor-default"
+          className="grid h-[72px] w-32 shrink-0 place-items-center overflow-hidden rounded-control border border-border bg-surface-muted disabled:cursor-default"
         >
           {thumbnail ? (
-            <img src={thumbnail} alt="" className="h-full w-full object-cover object-left-top" />
+            // Whole step, not a corner of it: the annotation is what the row is about.
+            <img src={thumbnail} alt="" className="max-h-full max-w-full object-contain" />
           ) : (
             <span className="text-[10px] text-text-muted">{t('guide.noFrame')}</span>
           )}

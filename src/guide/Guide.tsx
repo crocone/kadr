@@ -28,6 +28,7 @@ import { Button } from '@/core/ui/components'
 import { IconTrash } from '@/core/ui/icons'
 
 import { exportGuide, type GuideFormat } from './export'
+import { useStepPreviews } from './preview'
 import { StepRow } from './StepRow'
 import { StylePanel } from './StylePanel'
 import { useGuideRedact } from './useGuideRedact'
@@ -54,6 +55,7 @@ export function Guide() {
   const [styling, setStyling] = useState(false)
   const [language, setLanguage] = useState<OcrLanguage>(() => defaultLanguage(locale))
   const redact = useGuideRedact()
+  const previews = useStepPreviews(steps, style)
 
   useEffect(() => {
     const id = guideIdFromUrl()
@@ -107,38 +109,9 @@ export function Guide() {
           className="min-w-56 flex-1 rounded-control border border-transparent bg-transparent px-2 py-1 text-lg font-semibold hover:border-border focus:border-border-strong focus:outline-none"
         />
 
-        <span className="font-mono text-[11px] text-text-muted">
+        <span className="shrink-0 font-mono text-[11px] text-text-muted">
           {t('guide.steps', { n: steps.length })}
         </span>
-
-        {FORMATS.map((format) => (
-          <Button
-            key={format}
-            size="sm"
-            variant={format === 'markdown' ? 'primary' : 'secondary'}
-            disabled={busy !== null || steps.length === 0}
-            onClick={() => {
-              runExport(format)
-            }}
-          >
-            {FORMAT_LABELS[format]}
-          </Button>
-        ))}
-
-        <OcrLanguagePicker value={language} onChange={setLanguage} />
-
-        <Button
-          size="sm"
-          disabled={redact.running || steps.length === 0}
-          title={t('guide.redact')}
-          onClick={() => {
-            void redact.run(steps, language)
-          }}
-        >
-          {redact.running
-            ? t('guide.redacting', { done: redact.done + 1, total: redact.total })
-            : t('guide.redact')}
-        </Button>
 
         <button
           type="button"
@@ -149,11 +122,48 @@ export function Guide() {
               window.close()
             })
           }}
-          className="grid h-8 w-8 place-items-center rounded-control text-text-muted hover:bg-danger/10 hover:text-danger"
+          className="grid h-8 w-8 shrink-0 place-items-center rounded-control text-text-muted hover:bg-danger/10 hover:text-danger"
         >
           <IconTrash size={15} />
         </button>
       </header>
+
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-panel border border-border bg-surface p-3">
+        <span className="flex items-center gap-2">
+          <span className="font-mono text-[10px] tracking-[0.1em] text-text-muted uppercase">
+            {t('guide.export')}
+          </span>
+          {FORMATS.map((format) => (
+            <Button
+              key={format}
+              size="sm"
+              variant={format === 'markdown' ? 'primary' : 'secondary'}
+              disabled={busy !== null || steps.length === 0}
+              onClick={() => {
+                runExport(format)
+              }}
+            >
+              {FORMAT_LABELS[format]}
+            </Button>
+          ))}
+        </span>
+
+        <span className="ml-auto flex flex-wrap items-center gap-2">
+          <OcrLanguagePicker value={language} onChange={setLanguage} />
+          <Button
+            size="sm"
+            disabled={redact.running || steps.length === 0}
+            title={t('guide.redact')}
+            onClick={() => {
+              void redact.run(steps, language)
+            }}
+          >
+            {redact.running
+              ? t('guide.redacting', { done: redact.done + 1, total: redact.total })
+              : t('guide.redact')}
+          </Button>
+        </span>
+      </div>
 
       {busy ? (
         <p className="text-xs text-text-muted">
@@ -203,6 +213,7 @@ export function Guide() {
               key={step.id}
               step={step}
               startsPage={breaks.has(step.id)}
+              preview={previews.get(step.id) ?? null}
               onCaption={(caption) => {
                 setSteps((current) =>
                   current.map((other) =>

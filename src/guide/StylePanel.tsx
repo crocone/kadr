@@ -1,15 +1,7 @@
-/**
- * Guide annotation styling.
- *
- * The panel sits above the step list rather than in global settings: an internal guide
- * and a client-facing one are styled differently, and flipping a global setting between
- * them would be needless work. The result is visible right away on the thumbnails.
- */
+import type { BadgeStyle } from '@/core/doc/types'
 import { type ScribeStyle, STYLE_LIMITS } from '@/core/scribe/style'
 import { useT } from '@/core/ui/app-context'
 import { ColorInput, NumberField, Segmented } from '@/core/ui/controls'
-
-import type { BadgeStyle } from '@/core/doc/types'
 
 const BADGE_STYLES: readonly BadgeStyle[] = ['number', 'roman', 'bullet']
 
@@ -19,6 +11,13 @@ const BADGE_LABELS: Record<BadgeStyle, string> = {
   bullet: '•',
 }
 
+/**
+ * Guide annotation styling. Lives on the guide rather than in global settings: an
+ * internal guide and a customer-facing one are styled differently.
+ *
+ * Laid out as equal columns, each a vertical stack. Mixing controls that label to the
+ * left with controls that label above in one flex row makes every baseline disagree.
+ */
 export function StylePanel({
   style,
   onChange,
@@ -26,12 +25,9 @@ export function StylePanel({
   busy,
 }: {
   style: ScribeStyle
-  /** Live update while a color/size control is being dragged. */
+  /** Live update while a control is being dragged. */
   onChange: (style: ScribeStyle) => void
-  /**
-   * End of gesture. Steps are rebuilt only here: re-rendering ten documents on every
-   * slider tick takes seconds, and only the final state matters anyway.
-   */
+  /** End of gesture: only here are the steps redrawn. */
   onCommit: () => void
   busy: boolean
 }) {
@@ -39,30 +35,41 @@ export function StylePanel({
   const set = <K extends keyof ScribeStyle>(key: K, value: ScribeStyle[K]) => {
     onChange({ ...style, [key]: value })
   }
-  const commit = onCommit
+  const toggle = (key: 'outline' | 'badge' | 'caption') => {
+    onChange({ ...style, [key]: !style[key] })
+    onCommit()
+  }
 
   return (
-    <section className="flex flex-wrap items-end gap-4 rounded-panel border border-border bg-surface p-3">
-      <div className="min-w-48">
-        <ColorInput
-          label={t('guide.style.accent')}
-          value={style.accent}
-          onChange={(accent) => {
-            set('accent', accent)
-          }}
-          onCommit={commit}
-        />
-      </div>
+    <section className="flex flex-col gap-3 rounded-panel border border-border bg-surface p-3">
+      <header className="flex items-center gap-2">
+        <h2 className="font-mono text-[10px] tracking-[0.1em] text-text-muted uppercase">
+          {t('guide.style')}
+        </h2>
+        {busy ? (
+          <span className="text-[11px] text-text-muted">{t('guide.style.applying')}</span>
+        ) : null}
+      </header>
 
-      <Toggle
-        label={t('guide.style.outline')}
-        on={style.outline}
-        onToggle={() => {
-          onChange({ ...style, outline: !style.outline })
-          commit()
-        }}
-      >
-        <div className="w-20">
+      <div className="grid gap-x-4 gap-y-3 sm:grid-cols-2 lg:grid-cols-4">
+        <Column title={t('guide.style.accent')}>
+          <ColorInput
+            label={t('guide.style.accent')}
+            value={style.accent}
+            onChange={(accent) => {
+              set('accent', accent)
+            }}
+            onCommit={onCommit}
+          />
+        </Column>
+
+        <Column
+          title={t('guide.style.outline')}
+          on={style.outline}
+          onToggle={() => {
+            toggle('outline')
+          }}
+        >
           <NumberField
             label={t('guide.style.width')}
             value={style.outlineWidth}
@@ -71,29 +78,26 @@ export function StylePanel({
             onChange={(outlineWidth) => {
               set('outlineWidth', outlineWidth)
             }}
-            onCommit={commit}
+            onCommit={onCommit}
           />
-        </div>
-      </Toggle>
+        </Column>
 
-      <Toggle
-        label={t('guide.style.badge')}
-        on={style.badge}
-        onToggle={() => {
-          onChange({ ...style, badge: !style.badge })
-          commit()
-        }}
-      >
-        <Segmented
-          label={t('guide.style.badge')}
-          value={style.badgeStyle}
-          options={BADGE_STYLES.map((value) => ({ value, label: BADGE_LABELS[value] }))}
-          onChange={(badgeStyle) => {
-            set('badgeStyle', badgeStyle)
-            commit()
+        <Column
+          title={t('guide.style.badge')}
+          on={style.badge}
+          onToggle={() => {
+            toggle('badge')
           }}
-        />
-        <div className="w-20">
+        >
+          <Segmented
+            label={t('guide.style.badge')}
+            value={style.badgeStyle}
+            options={BADGE_STYLES.map((value) => ({ value, label: BADGE_LABELS[value] }))}
+            onChange={(badgeStyle) => {
+              set('badgeStyle', badgeStyle)
+              onCommit()
+            }}
+          />
           <NumberField
             label={t('guide.style.size')}
             value={style.badgeSize}
@@ -102,20 +106,17 @@ export function StylePanel({
             onChange={(badgeSize) => {
               set('badgeSize', badgeSize)
             }}
-            onCommit={commit}
+            onCommit={onCommit}
           />
-        </div>
-      </Toggle>
+        </Column>
 
-      <Toggle
-        label={t('guide.style.caption')}
-        on={style.caption}
-        onToggle={() => {
-          onChange({ ...style, caption: !style.caption })
-          commit()
-        }}
-      >
-        <div className="w-20">
+        <Column
+          title={t('guide.style.caption')}
+          on={style.caption}
+          onToggle={() => {
+            toggle('caption')
+          }}
+        >
           <NumberField
             label={t('guide.style.size')}
             value={style.captionSize}
@@ -124,49 +125,55 @@ export function StylePanel({
             onChange={(captionSize) => {
               set('captionSize', captionSize)
             }}
-            onCommit={commit}
+            onCommit={onCommit}
           />
-        </div>
-        <div className="min-w-44">
           <ColorInput
             label={t('guide.style.captionColor')}
             value={style.captionColor}
             onChange={(captionColor) => {
               set('captionColor', captionColor)
             }}
-            onCommit={commit}
+            onCommit={onCommit}
           />
-        </div>
-      </Toggle>
-
-      {busy ? (
-        <span className="ml-auto self-center text-xs text-text-muted">
-          {t('guide.style.applying')}
-        </span>
-      ) : null}
+        </Column>
+      </div>
     </section>
   )
 }
 
-/** A disabled annotation hides its settings instead of graying them out. */
-function Toggle({
-  label,
+/**
+ * One column: a title (a checkbox when the whole annotation can be switched off) and
+ * its controls stacked under it. A switched-off annotation keeps its height so the row
+ * does not jump when it is toggled.
+ */
+function Column({
+  title,
   on,
   onToggle,
   children,
 }: {
-  label: string
-  on: boolean
-  onToggle: () => void
+  title: string
+  on?: boolean
+  onToggle?: () => void
   children: React.ReactNode
 }) {
   return (
-    <div className="flex flex-col gap-1">
-      <label className="flex items-center gap-1.5 font-mono text-[10px] tracking-[0.08em] text-text-muted uppercase">
-        <input type="checkbox" checked={on} onChange={onToggle} />
-        {label}
-      </label>
-      {on ? <div className="flex items-center gap-2">{children}</div> : null}
+    <div className="flex min-w-0 flex-col gap-2">
+      {onToggle ? (
+        <label className="flex items-center gap-1.5 text-[11px] text-text-soft">
+          <input type="checkbox" checked={on} onChange={onToggle} className="accent-accent" />
+          {title}
+        </label>
+      ) : (
+        <span className="text-[11px] text-text-soft">{title}</span>
+      )}
+
+      <div className={cnStack(on)}>{children}</div>
     </div>
   )
+}
+
+function cnStack(on: boolean | undefined): string {
+  const base = 'flex flex-col gap-2'
+  return on === false ? `${base} pointer-events-none opacity-40` : base
 }
