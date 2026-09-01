@@ -279,6 +279,20 @@ export function MockupPanel({
         ))}
       </div>
 
+      {mockup !== 'none' && mockup !== 'custom' ? (
+        // The frame theme doubles as the body finish: pale metal or black.
+        <Segmented
+          value={frame.theme}
+          onChange={(theme) => {
+            setFrame({ theme })
+          }}
+          options={[
+            { value: 'light' as const, label: t('editor.device.silver') },
+            { value: 'dark' as const, label: t('editor.device.black') },
+          ]}
+        />
+      ) : null}
+
       {target ? <p className="text-[11px] text-text-muted">{t('editor.mockup.forLayer')}</p> : null}
 
       <Slider

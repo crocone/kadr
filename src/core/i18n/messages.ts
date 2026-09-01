@@ -362,6 +362,8 @@ export const messages = {
     'editor.device.ipad-pro-m4': 'iPad Pro M4',
     'editor.device.macbook-pro': 'MacBook Pro',
     'editor.device.custom': 'Own mockup',
+    'editor.device.silver': 'Silver',
+    'editor.device.black': 'Black',
     'editor.frame.tiltX': 'Tilt X',
     'editor.frame.tiltY': 'Tilt Y',
     'editor.eraser.size': 'Size',
@@ -549,10 +551,16 @@ export const messages = {
     'tracker.sending': 'Creating…',
     'tracker.created': 'The issue is created',
     'tracker.context': 'The page url, the browser and the screen size are added on their own.',
-    'tracker.notConfigured': 'No token for this tracker yet.',
+    'tracker.missing.token': 'No token for this tracker yet.',
+    'tracker.missing.project':
+      'Nowhere to create the issue: the repository, team or project is not set.',
+    'tracker.missing.baseUrl': 'The Jira address is not set.',
+    'tracker.missing.email': 'The Jira account email is not set.',
     'tracker.error.not-configured': 'Fill the tracker in the settings first',
     'tracker.error.no-permission': 'Without access to the tracker host nothing can be sent',
     'tracker.error.auth': 'The tracker turned the token down',
+    'tracker.error.token-scope':
+      'The token is accepted but not allowed to do this: it needs write access to the repository and to issues',
     'tracker.error.not-found': 'No such repository, team or project',
     'tracker.error.rate-limit': 'The tracker asks to slow down — try again in a minute',
     'tracker.error.upload-failed': 'The image did not go through',
@@ -567,7 +575,7 @@ export const messages = {
     'options.trackers.project': 'Where to create issues',
     'options.trackers.github.project': 'Repository, as owner/name',
     'options.trackers.github.hint':
-      'GitHub has no attachment API, so the frame is committed to .kadr/screenshots in that repository and linked from the issue. The token needs write access to it.',
+      'GitHub has no attachment API, so the frame is committed to .kadr/screenshots in that repository and linked from the issue. A fine-grained token needs Contents and Issues set to "Read and write" for this repository; a classic one needs the repo scope.',
     'options.trackers.linear.project': 'Team id',
     'options.trackers.linear.hint':
       'A personal API key from Linear settings. The team id is the one in the team url.',
@@ -944,6 +952,8 @@ export const messages = {
     'editor.device.ipad-pro-m4': 'iPad Pro M4',
     'editor.device.macbook-pro': 'MacBook Pro',
     'editor.device.custom': 'Свой мокап',
+    'editor.device.silver': 'Серебро',
+    'editor.device.black': 'Чёрный',
     'editor.frame.tiltX': 'Наклон по X',
     'editor.frame.tiltY': 'Наклон по Y',
     'editor.eraser.size': 'Размер',
@@ -1131,10 +1141,16 @@ export const messages = {
     'tracker.sending': 'Создаём…',
     'tracker.created': 'Задача создана',
     'tracker.context': 'Адрес страницы, браузер и размер экрана добавятся сами.',
-    'tracker.notConfigured': 'Для этого трекера ещё нет токена.',
+    'tracker.missing.token': 'Для этого трекера ещё нет токена.',
+    'tracker.missing.project':
+      'Некуда создавать задачу: не указан репозиторий, команда или проект.',
+    'tracker.missing.baseUrl': 'Не указан адрес Jira.',
+    'tracker.missing.email': 'Не указана почта учётки Jira.',
     'tracker.error.not-configured': 'Сначала заполните трекер в настройках',
     'tracker.error.no-permission': 'Без доступа к адресу трекера отправить нечего',
     'tracker.error.auth': 'Трекер не принял токен',
+    'tracker.error.token-scope':
+      'Токен принят, но прав не хватает: нужен доступ на запись в репозиторий и в задачи',
     'tracker.error.not-found': 'Нет такого репозитория, команды или проекта',
     'tracker.error.rate-limit': 'Трекер просит помедленнее — повторите через минуту',
     'tracker.error.upload-failed': 'Картинка не доехала',
@@ -1149,7 +1165,7 @@ export const messages = {
     'options.trackers.project': 'Где создавать задачи',
     'options.trackers.github.project': 'Репозиторий, вида owner/name',
     'options.trackers.github.hint':
-      'У GitHub нет API для вложений, поэтому кадр коммитится в .kadr/screenshots этого репозитория, а задача ссылается на него. Токену нужен доступ на запись.',
+      'У GitHub нет API для вложений, поэтому кадр коммитится в .kadr/screenshots этого репозитория, а задача ссылается на него. Тонкому токену нужны Contents и Issues на «Read and write» для этого репозитория, классическому — скоуп repo.',
     'options.trackers.linear.project': 'Идентификатор команды',
     'options.trackers.linear.hint':
       'Личный API-ключ из настроек Linear. Идентификатор команды — тот, что в её адресе.',

@@ -27,6 +27,22 @@ const FOLDER = '.kadr/screenshots'
 type ContentsResponse = { content?: { download_url?: string | null } }
 type IssueResponse = { html_url?: string; number?: number }
 
+/**
+ * The field is labelled "where to create issues", so a pasted repository url is the
+ * natural answer — the API wants `owner/repo`, and both forms are reduced to it here
+ * rather than being refused as "not filled in". A url copied from a repository page
+ * carries extra path after the name, so only the first two segments are kept.
+ */
+export function repoOf(config: TrackerConfig): string {
+  const path = config.project
+    .trim()
+    .split(/[?#]/)[0]
+    ?.replace(/^(?:https?:\/\/)?(?:www\.)?github\.com\//, '')
+  const [owner, repo] = (path ?? '').split('/')
+  if (!owner || !repo) return ''
+  return `${owner}/${repo.replace(/\.git$/, '')}`
+}
+
 function headers(config: TrackerConfig): Record<string, string> {
   return {
     Authorization: `Bearer ${config.token}`,
@@ -43,12 +59,12 @@ export const github: Tracker = {
 
   missing: (config) => {
     if (!config.token.trim()) return 'token'
-    if (!/^[\w.-]+\/[\w.-]+$/.test(config.project.trim())) return 'project'
+    if (!/^[\w.-]+\/[\w.-]+$/.test(repoOf(config))) return 'project'
     return null
   },
 
   async create(draft: IssueDraft, config: TrackerConfig, deps): Promise<CreatedIssue> {
-    const repo = config.project.trim()
+    const repo = repoOf(config)
     const path = `${FOLDER}/${draft.filename}`
 
     const upload = await request(deps, `${API}/repos/${repo}/contents/${encodeURI(path)}`, {

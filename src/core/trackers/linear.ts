@@ -72,9 +72,18 @@ async function graphql<T>(
 export const linear: Tracker = {
   kind: 'linear',
 
-  // The file goes not to api.linear.app but to a storage host that arrives in the
-  // response. The exact host isn't known in advance, so the whole Linear zone is requested.
-  origins: () => ['https://api.linear.app/*', 'https://uploads.linear.app/*'],
+  /**
+   * The file goes not to api.linear.app but to the storage host that arrives in the
+   * response — a presigned Google Cloud Storage url. That host must be listed here:
+   * the signed url answers no CORS headers, and only a granted host permission lets
+   * an extension page reach it at all. The url arrives mid-send, too late to ask for
+   * permission — the user gesture that opens the prompt is long gone by then.
+   */
+  origins: () => [
+    'https://api.linear.app/*',
+    'https://uploads.linear.app/*',
+    'https://storage.googleapis.com/*',
+  ],
 
   missing: (config) => {
     if (!config.token.trim()) return 'token'

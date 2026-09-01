@@ -34,8 +34,8 @@ describe('chromeHeight', () => {
   })
 
   it('stays readable on a tiny frame and modest on a huge one', () => {
-    expect(chromeHeight(120)).toBe(28)
-    expect(chromeHeight(6000)).toBe(76)
+    expect(chromeHeight(120)).toBe(34)
+    expect(chromeHeight(6000)).toBe(104)
   })
 })
 

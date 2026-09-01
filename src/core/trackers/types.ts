@@ -24,6 +24,9 @@ export type TrackerConfig = {
 
 export const EMPTY_TRACKER: TrackerConfig = { project: '', token: '', baseUrl: '', email: '' }
 
+/** A settings field the tracker cannot work without — named, so the UI can say which one. */
+export type TrackerField = keyof TrackerConfig
+
 export type IssueDraft = {
   title: string
   /** Issue body in markdown: description plus page context. */
@@ -48,6 +51,7 @@ export type TrackerErrorCode =
   | 'not-configured'
   | 'no-permission'
   | 'auth'
+  | 'token-scope'
   | 'not-found'
   | 'rate-limit'
   | 'upload-failed'
@@ -64,9 +68,16 @@ export class TrackerFailure extends Error {
   }
 }
 
-/** Service responses are decoded once, here: downstream only our codes exist. */
+/**
+ * Service responses are decoded once, here: downstream only our codes exist.
+ *
+ * 401 and 403 are kept apart on purpose: the first means the token was refused, the
+ * second that it was accepted and is not allowed to do this. They are fixed in
+ * different places — a new token versus its scopes.
+ */
 export function errorCodeForStatus(status: number): TrackerErrorCode {
-  if (status === 401 || status === 403) return 'auth'
+  if (status === 401) return 'auth'
+  if (status === 403) return 'token-scope'
   if (status === 404) return 'not-found'
   if (status === 429) return 'rate-limit'
   return 'bad-response'
@@ -78,8 +89,8 @@ export type Tracker = {
   kind: TrackerKind
   /** Hosts the requests will hit: permission for them is requested before sending. */
   origins: (config: TrackerConfig) => string[]
-  /** What's missing from the settings. `null` — ready to send. */
-  missing: (config: TrackerConfig) => string | null
+  /** Which settings field is missing or malformed. `null` — ready to send. */
+  missing: (config: TrackerConfig) => TrackerField | null
   create: (draft: IssueDraft, config: TrackerConfig, deps: TrackerDeps) => Promise<CreatedIssue>
 }
 

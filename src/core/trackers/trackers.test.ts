@@ -1,6 +1,8 @@
 import { describe, expect, it, vi } from 'vitest'
 
+import { github } from './github'
 import { createIssue } from './index'
+import { linear } from './linear'
 import { toAdf } from './jira'
 import { EMPTY_TRACKER, type IssueDraft, type TrackerConfig, TrackerFailure } from './types'
 
@@ -72,6 +74,50 @@ describe('github', () => {
     })
   })
 
+  it('takes the repository url the field asks for and works with owner/name', () => {
+    for (const project of [
+      'https://github.com/acme/site',
+      'https://github.com/acme/site.git',
+      'https://www.github.com/acme/site/',
+      'github.com/acme/site/issues',
+      'acme/site',
+    ]) {
+      expect(github.missing(config({ token: 'ghp_x', project }))).toBeNull()
+    }
+
+    expect(github.missing(config({ token: 'ghp_x', project: 'https://example.com/acme' }))).toBe(
+      'project',
+    )
+  })
+
+  it('addresses the api by owner/name even when the url was pasted', async () => {
+    const { deps, calls } = fetchReturning(
+      json({ content: { download_url: 'https://raw.example/shot.png' } }, 201),
+      json({ html_url: 'https://github.com/acme/site/issues/7', number: 7 }, 201),
+    )
+
+    await createIssue(
+      'github',
+      config({ token: 'ghp_x', project: 'https://github.com/acme/site' }),
+      draft,
+      deps,
+    )
+
+    expect(calls[0]?.url).toBe(
+      'https://api.github.com/repos/acme/site/contents/.kadr/screenshots/shop-checkout.png',
+    )
+  })
+
+  it('separates a token without the rights from a token that was refused', async () => {
+    const { deps } = fetchReturning(
+      json({ message: 'Resource not accessible by personal access token' }, 403),
+    )
+
+    await expect(createIssue('github', settings, draft, deps)).rejects.toMatchObject({
+      code: 'token-scope',
+    })
+  })
+
   it('does not create an issue when the frame could not be uploaded', async () => {
     const { deps, calls } = fetchReturning(json({ content: {} }, 201))
 
@@ -124,6 +170,12 @@ describe('linear', () => {
     expect(created.variables.input.teamId).toBe('team_1')
     expect(created.variables.input.description).toContain('https://uploads.linear.app/asset/1')
     expect(issue).toEqual({ url: 'https://linear.app/acme/issue/ENG-17', key: 'ENG-17' })
+  })
+
+  // Without permission for the storage host the browser applies CORS to the upload,
+  // the signed url answers no headers for it, and the send dies on "failed to fetch".
+  it('asks for the storage host the file actually goes to', () => {
+    expect(linear.origins(settings)).toContain('https://storage.googleapis.com/*')
   })
 
   it('treats an error inside a 200 answer as an error', async () => {

@@ -52,7 +52,7 @@ export function TrackerPanel({
 
       {missing ? (
         <p className="text-[11px] leading-relaxed text-text-muted">
-          {t('tracker.notConfigured')}{' '}
+          {t(`tracker.missing.${missing}` as MessageKey)}{' '}
           <button
             type="button"
             onClick={() => {

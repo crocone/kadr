@@ -22,64 +22,113 @@ import type {
   Rect,
 } from './types'
 
-/** Browser bar height as a fraction of capture width, with pixel floor and ceiling. */
+/**
+ * Browser header height as a fraction of capture width, with pixel floor and ceiling.
+ *
+ * The header holds two rows — the tab strip and the toolbar — so it is taller than a
+ * single bar: a real Chrome window spends about 6% of a 1440 px width on them.
+ */
 export function chromeHeight(width: number): number {
-  return Math.max(28, Math.min(76, Math.round(width * 0.052)))
+  return Math.max(34, Math.min(104, Math.round(width * 0.058)))
 }
+
+/** Share of the header taken by the tab strip; the toolbar gets the rest. */
+export const TAB_STRIP = 0.46
+
+/** Body finish. Chosen by the frame theme: light picks the pale metal, dark the black one. */
+export type DeviceMaterial = 'titanium' | 'obsidian' | 'aluminium'
+
+/** A side button: which edge it sits on, and where along the screen height it starts. */
+export type SideButton = { side: 'left' | 'right'; at: number; len: number }
+
+/** How far side buttons stick out of the body, as a fraction of the screen's shorter side. */
+export const BUTTON_DEPTH = 0.0065
 
 export type DeviceSpec = {
   /** Body bezel as a fraction of the screen's shorter side. */
   bezel: number
+  /** Share of the bezel taken by the metal rim; the rest is the black glass border. */
+  rim: number
   /** Body and screen corner radii as fractions of the screen's shorter side. */
   bodyRadius: number
   screenRadius: number
-  /** Cutout: island, punch-hole, notch, or none. */
-  cutout: 'island' | 'hole' | 'notch' | 'none'
+  /** Cutout: island, punch-hole, front camera, or none. */
+  cutout: 'island' | 'hole' | 'camera' | 'none'
   /** Bottom base — laptop only. */
   base: boolean
+  material: DeviceMaterial
+  /** Buttons on the left and right edges, positioned along the screen height. */
+  buttons: readonly SideButton[]
   /** The device's own screen aspect ratio, width to height. */
   aspect: number
 }
 
 export const DEVICES: Record<Exclude<DeviceMockup, 'none'>, DeviceSpec> = {
   'iphone-16-pro': {
-    bezel: 0.035,
+    bezel: 0.044,
+    rim: 0.36,
     bodyRadius: 0.16,
     screenRadius: 0.13,
     cutout: 'island',
     base: false,
+    material: 'titanium',
+    buttons: [
+      { side: 'left', at: 0.1, len: 0.035 },
+      { side: 'left', at: 0.165, len: 0.075 },
+      { side: 'left', at: 0.255, len: 0.075 },
+      { side: 'right', at: 0.185, len: 0.12 },
+      { side: 'right', at: 0.345, len: 0.05 },
+    ],
     aspect: 1179 / 2556,
   },
   'pixel-9-pro': {
-    bezel: 0.032,
+    bezel: 0.038,
+    rim: 0.4,
     bodyRadius: 0.11,
     screenRadius: 0.09,
     cutout: 'hole',
     base: false,
+    material: 'obsidian',
+    buttons: [
+      { side: 'right', at: 0.12, len: 0.07 },
+      { side: 'right', at: 0.215, len: 0.13 },
+    ],
     aspect: 1280 / 2856,
   },
   'ipad-pro-m4': {
     bezel: 0.045,
+    rim: 0.44,
     bodyRadius: 0.06,
     screenRadius: 0.045,
-    cutout: 'none',
+    cutout: 'camera',
     base: false,
+    material: 'aluminium',
+    buttons: [
+      { side: 'right', at: 0.035, len: 0.045 },
+      { side: 'right', at: 0.095, len: 0.045 },
+    ],
     aspect: 2064 / 2752,
   },
   'macbook-pro': {
-    bezel: 0.012,
-    bodyRadius: 0.02,
-    screenRadius: 0.015,
-    cutout: 'notch',
+    bezel: 0.014,
+    rim: 0.34,
+    bodyRadius: 0.014,
+    screenRadius: 0.012,
+    cutout: 'camera',
     base: true,
+    material: 'aluminium',
+    buttons: [],
     aspect: 3456 / 2234,
   },
   custom: {
     bezel: 0.04,
+    rim: 0.5,
     bodyRadius: 0.05,
     screenRadius: 0.03,
     cutout: 'none',
     base: false,
+    material: 'aluminium',
+    buttons: [],
     aspect: 16 / 9,
   },
 }
@@ -103,14 +152,17 @@ export function decoratedRect(
 
   if (mockup !== 'none') {
     const spec = DEVICES[mockup]
-    const bezel = Math.min(screen.w, screen.h) * spec.bezel
+    const side = Math.min(screen.w, screen.h)
+    const bezel = side * spec.bezel
     const base = spec.base ? screen.w * BASE.height : 0
     const overhang = spec.base ? screen.w * BASE.overhang : 0
+    // Side buttons stick out past the body, so the box has to count them too.
+    const bump = spec.buttons.length > 0 ? side * BUTTON_DEPTH : 0
 
     return {
-      x: screen.x - bezel - overhang,
+      x: screen.x - bezel - overhang - bump,
       y: screen.y - bezel,
-      w: screen.w + bezel * 2 + overhang * 2,
+      w: screen.w + (bezel + overhang + bump) * 2,
       h: screen.h + bezel * 2 + base,
     }
   }

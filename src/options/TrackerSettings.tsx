@@ -6,9 +6,13 @@ import { useApp } from '@/core/ui/app-context'
 import { Field, Select } from '@/core/ui/components'
 import { Chip } from '@/core/ui/controls'
 
-/** Where to get a token: each tracker has its own issuance page. */
+/**
+ * Where to get a token: each tracker has its own issuance page. GitHub's link goes to
+ * the fine-grained form, not to the classic list — per-repository Contents and Issues
+ * rights, the ones the hint asks for, exist only there.
+ */
 const TOKEN_PAGE: Record<TrackerKind, string> = {
-  github: 'https://github.com/settings/tokens',
+  github: 'https://github.com/settings/personal-access-tokens/new',
   linear: 'https://linear.app/settings/api',
   jira: 'https://id.atlassian.com/manage-profile/security/api-tokens',
 }
