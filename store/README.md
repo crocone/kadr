@@ -28,6 +28,7 @@ sources — capture them with Kadr itself once the build is loaded.
 | Screenshot 3 | 1280×800 | The library: search, tags, thumbnails                                  |
 | Screenshot 4 | 1280×800 | Offline redaction: the findings list next to a blurred email           |
 | Screenshot 5 | 1280×800 | Send to a tracker, with the created issue link                         |
+| Screenshot 6 | 1280×800 | Send to a tracker, with the created issue link                         |
 | Small tile   | 440×280  | The icon and the promise: no trial, no watermark                       |
 | Marquee      | 1400×560 | Optional; only for a featured slot                                     |
 
