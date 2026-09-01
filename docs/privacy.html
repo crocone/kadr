@@ -51,7 +51,8 @@
           <b>Sending a shot to an issue tracker.</b> If you configure GitHub, Linear or Jira, the
           picture, the title, your description and the page context (url, browser, screen size) go
           to that tracker with your token. Access to the tracker host is requested at that moment,
-          not at install time.
+          not at install time. Linear hands back a presigned upload url on
+          <code>storage.googleapis.com</code>, so that host is asked for together with it.
         </li>
       </ul>
 
@@ -136,7 +137,8 @@
             <b>Отправка снимка в трекер.</b> Если вы настроили GitHub, Linear или Jira, картинка,
             заголовок, ваше описание и контекст страницы (адрес, браузер, размер экрана) уходят в
             этот трекер с вашим токеном. Доступ к адресу трекера запрашивается в этот момент, а не
-            при установке.
+            при установке. Linear отдаёт presigned-ссылку для загрузки на
+            <code>storage.googleapis.com</code>, поэтому этот хост запрашивается вместе с ним.
           </li>
         </ul>
 
