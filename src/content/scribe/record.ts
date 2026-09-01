@@ -200,10 +200,30 @@ function maskedFields(): HTMLElement[] {
 }
 
 /**
+ * Steps leave strictly one at a time.
+ *
+ * A click on a button blurs the field the user just filled, so `pointerdown` and
+ * `change` arrive within milliseconds. Run together, whichever answer comes back
+ * first shows the HUD and unmasks the fields while the other frame is still being
+ * shot — and the badge lands on the finished guide. The wait costs nothing: a step
+ * this close to the previous one reuses the previous frame anyway.
+ *
+ * The queue also keeps the write order: merging a click with the typing that follows
+ * only works if the click reaches the background first.
+ */
+let sending: Promise<void> = Promise.resolve()
+
+function send(event: ScribeEvent): Promise<void> {
+  const turn = sending.then(() => deliver(event))
+  sending = turn.catch(() => undefined)
+  return turn
+}
+
+/**
  * Sends a step. The HUD hides for the duration: the background shoots this same tab,
  * and a lingering "recording" badge would land in every frame of the guide.
  */
-async function send(event: ScribeEvent): Promise<void> {
+async function deliver(event: ScribeEvent): Promise<void> {
   const recorder = active
   if (!recorder) return
 

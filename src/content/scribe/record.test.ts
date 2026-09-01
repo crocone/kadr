@@ -9,7 +9,15 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
  * checking it after the response is pointless — the state is captured here, from
  * inside the send.
  */
-const sent: { type: string; shown: Record<string, string> }[] = []
+const sent: { type: string; shown: Record<string, string>; hudHidden: boolean }[] = []
+
+/** Lets a test hold the background's answer open, as a slow frame capture would. */
+let hold: Promise<void> | null = null
+
+function hudHiddenNow(): boolean {
+  const host = document.querySelector<HTMLElement>('[data-kadr-overlay]')
+  return host !== null && host.style.display === 'none'
+}
 
 function shownNow(): Record<string, string> {
   const shown: Record<string, string> = {}
@@ -27,9 +35,10 @@ function shownNow(): Record<string, string> {
 }
 
 vi.mock('@/core/messaging', () => ({
-  sendMessage: vi.fn((type: string) => {
-    sent.push({ type, shown: shownNow() })
-    return Promise.resolve({ ok: true, steps: 1, dropped: 0 })
+  sendMessage: vi.fn(async (type: string) => {
+    sent.push({ type, shown: shownNow(), hudHidden: hudHiddenNow() })
+    if (hold) await hold
+    return { ok: true, steps: 1, dropped: 0 }
   }),
 }))
 
@@ -40,6 +49,7 @@ const { beginRecording, endRecording } = await import('./record')
 
 beforeEach(() => {
   sent.length = 0
+  hold = null
   document.body.innerHTML = ''
   // jsdom does not paint, so animation frames have to be pushed by hand.
   vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
@@ -106,6 +116,43 @@ describe('маска введённых значений', () => {
       expect(withStyle.getAttribute('style')).toBe('color: red')
     })
     expect(without.hasAttribute('style')).toBe(false)
+  })
+
+  /**
+   * A click on a button blurs the field the user just filled: `pointerdown` and
+   * `change` land within milliseconds. Run together, the first answer to come back
+   * showed the HUD while the second frame was still being shot — and the recording
+   * badge landed on the finished guide.
+   */
+  it('holds the next step until the previous frame is shot', async () => {
+    document.body.innerHTML = '<input id="q" value="secret"><button id="go">go</button>'
+
+    beginRecording(0, 0)
+
+    let release!: () => void
+    hold = new Promise((resolve) => {
+      release = resolve
+    })
+
+    document
+      .querySelector('#go')!
+      .dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, button: 0 }))
+    document.querySelector('#q')!.dispatchEvent(new Event('change', { bubbles: true }))
+
+    await vi.waitFor(() => {
+      expect(sent).toHaveLength(1)
+    })
+    // The second step waits its turn while the first frame is still being shot.
+    await new Promise((resolve) => setTimeout(resolve, 20))
+    expect(sent).toHaveLength(1)
+
+    release()
+    await vi.waitFor(() => {
+      expect(sent).toHaveLength(2)
+    })
+    // Its frame is shot with the HUD hidden and the value masked, same as the first.
+    expect(sent[1]?.hudHidden).toBe(true)
+    expect(sent[1]?.shown.q).not.toContain('secret')
   })
 
   it('never records a password field at all', async () => {
