@@ -47,7 +47,6 @@ export default defineManifest({
     // The content script writes to the clipboard on an overlay button click; without
     // this permission a page's own permissions-policy could deny it.
     'clipboardWrite',
-    'offscreen',
     'contextMenus',
   ],
 

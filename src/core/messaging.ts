@@ -1,5 +1,5 @@
 /**
- * Typed messages between popup, service worker, content script, and offscreen.
+ * Typed messages between popup, service worker, and content script.
  * One union for the whole extension: add a mode and the compiler finds every
  * place that has to handle it.
  */
@@ -308,7 +308,7 @@ export type MessageMap = {
   /** Liveness check of the content script before injecting a second copy. */
   ping: {
     request: Record<string, never>
-    response: { ok: true; from: 'background' | 'content' | 'offscreen' }
+    response: { ok: true; from: 'background' | 'content' }
   }
 }
 

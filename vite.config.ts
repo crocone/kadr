@@ -57,7 +57,6 @@ export default defineConfig({
         library: resolve(root, 'src/library/index.html'),
         guide: resolve(root, 'src/guide/index.html'),
         welcome: resolve(root, 'src/welcome/index.html'),
-        offscreen: resolve(root, 'src/offscreen/index.html'),
       },
     },
   },
