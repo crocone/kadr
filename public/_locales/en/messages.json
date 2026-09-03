@@ -4,7 +4,7 @@
     "description": "Extension name shown in the store and the toolbar"
   },
   "extDescription": {
-    "message": "Capture any page, beautify the shot and turn clicks into a step guide. No trial, no watermarks, no PRO lock.",
+    "message": "Capture any page, beautify the shot, record a click-by-click guide, redact private data offline. No trial, no watermarks.",
     "description": "Extension description shown in the store"
   },
   "cmdCaptureFullPage": {

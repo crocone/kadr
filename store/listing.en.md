@@ -6,8 +6,7 @@ Kadr — screenshots & step guides
 
 ## Short description (132 characters max)
 
-Capture any page, beautify the shot, redact private data offline. No trial, no watermarks,
-no PRO lock.
+Capture any page, beautify the shot, record a click-by-click guide, redact private data offline. No trial, no watermarks.
 
 ## Category
 
@@ -23,8 +22,11 @@ tracker integration delivers the result.
 ## Full description
 
 **Take the shot.** The whole page stitched from frames, the visible area, a region you drag
-with a pixel magnifier, or a DOM element picked by hovering it. A responsive series shoots
-375, 768 and 1440 px in one go and puts all three on one canvas.
+with a pixel magnifier, or a DOM element picked by hovering it. A chat or an endless feed is
+captured while it scrolls, stitched by content rather than coordinates, so inner scroll
+containers work too. Hover a table and copy it as CSV, Markdown or JSON instead of a
+picture. A responsive series shoots 375, 768 and 1440 px in one go and puts all three on
+one canvas. A saved shot can be reshot from the same page at the same width with one click.
 
 **Make it presentable.** Backgrounds drawn in code — gradients, patterns, solids — margins,
 corner radius, shadows, real macOS and Windows 11 browser frames with an editable url,
@@ -35,9 +37,15 @@ JSON with your team.
 with your local fonts, shapes and callouts. Blur stays a layer you can move or remove later
 instead of pixels burnt into the image.
 
+**Turn clicks into a guide.** Press Record, walk through the interface, press Stop. Every
+click becomes a step: a frame with the element outlined, a numbered badge and a caption like
+"Click 'Save'" taken from the element's own label. Restyle the whole guide at once, redact
+private data across every step offline, and export it as Markdown with images, a PDF or
+one long image.
+
 **Hide what should not be public.** Text recognition runs inside the browser — no key, no
-server, no upload — and finds emails, phone numbers, cards and tokens for you to cover with
-one click. Nothing is redacted without your confirmation, and nothing is ever a guarantee:
+server, no upload — and finds emails, phone numbers, cards, IBANs, IP addresses, JWTs and API keys for you to
+cover with one click. Nothing is redacted without your confirmation, and nothing is ever a guarantee:
 check the shot before you publish it.
 
 **Send it where the work is.** A library with search by site, date, tag and the text
@@ -46,13 +54,15 @@ WebP or PDF. Or go straight to a GitHub, Linear or Jira issue with your own toke
 picture, the page url, the browser and the screen size come along.
 
 **Bring your own AI, or none at all.** AI is off by default and makes no request until you
-turn it on and enter a key. Any OpenAI-compatible endpoint works, including a local Ollama
-or LM Studio, and the redaction pass above needs no AI at all.
+turn it on and enter a key. Write your own prompts and run them on the shot, or edit the
+picture with words and get the result back as a layer. OpenAI, Anthropic, Google, a local
+Ollama or LM Studio, or any OpenAI-compatible endpoint. The redaction pass above needs no
+AI at all.
 
 **No telemetry.** Not a line about you goes anywhere: no counters, no analytics, no
 "anonymous statistics". The extension makes exactly three kinds of network request, all of
-them started by you: an AI action with your key, a one-time dictionary download for offline
-text recognition, and sending a shot to the tracker you configured.
+them started by you: an AI action with your key, a language pack download for offline text
+recognition, and sending a shot to the tracker you configured.
 
 Open source, MIT: <https://github.com/crocone/kadr>
 
@@ -75,7 +85,6 @@ Open source, MIT: <https://github.com/crocone/kadr>
 | `downloads`                   | Save the exported file                                                                                                                                                                                                                                                                      |
 | `clipboardWrite`              | Copy the shot to the clipboard on the Copy button                                                                                                                                                                                                                                           |
 | `contextMenus`                | The right-click entry points into capture                                                                                                                                                                                                                                                   |
-| `offscreen`                   | Render and encode outside the service worker, which has no DOM                                                                                                                                                                                                                              |
 | Host access (`<all_urls>`)    | Optional, one site at a time and always behind a button: reshooting a saved shot, recording a step guide across pages, and sending to the issue tracker the user configured — Linear additionally needs storage.googleapis.com, where its API hands back a presigned url for the attachment |
 | `wasm-unsafe-eval` in the CSP | Offline text recognition compiles a WebAssembly module shipped inside the package; `eval()` and strings-as-code stay forbidden                                                                                                                                                              |
 
