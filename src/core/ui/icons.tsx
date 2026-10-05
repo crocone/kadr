@@ -382,3 +382,83 @@ export const IconCheck = (props: IconProps) => (
     <path d="M4.5 10.5 8 14l7.5-8" />
   </Icon>
 )
+
+/** Recording: a filled dot, the one symbol nobody has to be taught. */
+export const IconRecord = (props: IconProps) => (
+  <Icon {...props}>
+    <circle cx="10" cy="10" r="5" fill="currentColor" stroke="none" />
+  </Icon>
+)
+
+export const IconStop = (props: IconProps) => (
+  <Icon {...props}>
+    <rect x="5.5" y="5.5" width="9" height="9" rx="1.5" fill="currentColor" stroke="none" />
+  </Icon>
+)
+
+export const IconPause = (props: IconProps) => (
+  <Icon {...props}>
+    <path d="M7.5 5v10M12.5 5v10" strokeWidth={2} />
+  </Icon>
+)
+
+export const IconPlay = (props: IconProps) => (
+  <Icon {...props}>
+    <path d="M6.5 4.5 15 10l-8.5 5.5z" fill="currentColor" />
+  </Icon>
+)
+
+/** A window with a title bar: the desktop-capture source, as opposed to a tab. */
+export const IconWindow = (props: IconProps) => (
+  <Icon {...props}>
+    <rect x="2.5" y="4" width="15" height="12" rx="1.6" />
+    <path d="M2.5 7.5h15" />
+  </Icon>
+)
+
+export const IconScreen = (props: IconProps) => (
+  <Icon {...props}>
+    <rect x="2.5" y="4" width="15" height="10" rx="1.6" />
+    <path d="M7 17h6" />
+  </Icon>
+)
+
+export const IconMicrophone = (props: IconProps) => (
+  <Icon {...props}>
+    <rect x="7.5" y="2.5" width="5" height="9" rx="2.5" />
+    <path d="M4.5 9.5a5.5 5.5 0 0 0 11 0M10 15v2.5" />
+  </Icon>
+)
+
+/** Zoom keyframe on the clip timeline. */
+export const IconZoom = (props: IconProps) => (
+  <Icon {...props}>
+    <circle cx="9" cy="9" r="5" />
+    <path d="M12.8 12.8 16.5 16.5M7 9h4M9 7v4" />
+  </Icon>
+)
+
+/** Cutting pauses out of a clip. */
+export const IconScissors = (props: IconProps) => (
+  <Icon {...props}>
+    <circle cx="5" cy="5" r="2" />
+    <circle cx="5" cy="15" r="2" />
+    <path d="M6.6 6.4 16 15M6.6 13.6 16 5" />
+  </Icon>
+)
+
+/** Sound on: a speaker with waves. */
+export const IconSound = (props: IconProps) => (
+  <Icon {...props}>
+    <path d="M3.5 8v4h3l4 3.5v-11L6.5 8z" />
+    <path d="M13 7.5a3.5 3.5 0 0 1 0 5M15 5a7 7 0 0 1 0 10" />
+  </Icon>
+)
+
+/** Sound off: the same speaker, crossed out. */
+export const IconMute = (props: IconProps) => (
+  <Icon {...props}>
+    <path d="M3.5 8v4h3l4 3.5v-11L6.5 8z" />
+    <path d="M13 7.5 17 12.5M17 7.5l-4 5" />
+  </Icon>
+)

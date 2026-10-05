@@ -24,6 +24,17 @@ import {
 import { captureModeForMenuItem, createContextMenus, feedbackUrlForMenuItem } from './context-menus'
 import { ensureContentScript } from './content-script'
 import { keepServiceWorkerAlive } from './keep-alive'
+import {
+  onRecordedTabUpdated,
+  pauseRecording,
+  recoverRecordings,
+  recordEvents,
+  recordingEnded,
+  hostStarted,
+  recordingStatus,
+  startRecording,
+  stopRecording,
+} from './record'
 import { reshootDocs } from './reshoot'
 import {
   onTabRemoved,
@@ -35,6 +46,7 @@ import {
 } from './scribe'
 import { runResponsiveSeries } from './responsive-run'
 
+const CLIP_PAGE = 'src/clip/index.html'
 const EDITOR_PAGE = 'src/editor/index.html'
 const GUIDE_PAGE = 'src/guide/index.html'
 const LIBRARY_PAGE = 'src/library/index.html'
@@ -51,6 +63,10 @@ async function currentLocale(): Promise<Locale> {
 async function openEditor(docId?: string): Promise<void> {
   const url = chrome.runtime.getURL(docId ? `${EDITOR_PAGE}?doc=${docId}` : EDITOR_PAGE)
   await chrome.tabs.create({ url })
+}
+
+async function openClip(clipId: string): Promise<void> {
+  await chrome.tabs.create({ url: chrome.runtime.getURL(`${CLIP_PAGE}?clip=${clipId}`) })
 }
 
 /**
@@ -153,6 +169,9 @@ chrome.runtime.onInstalled.addListener((details) => {
 
 chrome.runtime.onStartup.addListener(() => {
   void createContextMenus()
+  // A recording interrupted by the browser closing left its chunks on disk. They are a
+  // clip minus the last couple of seconds, and nobody will go looking for them.
+  void recoverRecordings()
 })
 
 /**
@@ -182,6 +201,9 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
  */
 chrome.tabs.onUpdated.addListener((tabId, info, tab) => {
   void currentLocale().then((locale) => onTabUpdated(tabId, info, tab, locale))
+  // A recording survives navigation — `tabCapture` follows the tab, not the document —
+  // but the script writing the event timeline does not, and has to be put back.
+  if (info.status === 'complete') void onRecordedTabUpdated(tabId)
 })
 
 chrome.tabs.onRemoved.addListener((tabId) => {
@@ -220,6 +242,104 @@ registerMessageHandlers({
   },
 
   'scribe:status': () => scribeStatus(),
+
+  /**
+   * The recording permission was already requested by the popup, from its click: the
+   * worker has no gesture and Chrome would refuse it here.
+   */
+  'record:start': async ({ source, tabId, microphone }) => {
+    try {
+      const tab = tabId === undefined ? null : await chrome.tabs.get(tabId).catch(() => null)
+      const clipId = await startRecording({
+        source,
+        tab,
+        microphone: microphone ?? false,
+      })
+      return { ok: true, clipId }
+    } catch (error) {
+      const reason = error instanceof CaptureFailure ? error.reason : 'capture-failed'
+      if (reason === 'capture-failed') console.error('[kadr] recording could not start', error)
+      return { ok: false, error: reason }
+    }
+  },
+
+  /**
+   * Stopping outlives the popup that asked for it: the parts still have to be merged and
+   * the file probed, and both take seconds on a long recording.
+   */
+  'record:stop': async () => {
+    const stopKeepAlive = keepServiceWorkerAlive()
+    try {
+      const clipId = await stopRecording()
+      console.info('[kadr] record: stop finished', clipId ?? 'with no clip')
+      if (clipId) await openClip(clipId)
+      return { ok: true, clipId }
+    } finally {
+      stopKeepAlive()
+    }
+  },
+
+  'record:pause': async ({ paused }) => ({ ok: true, paused: await pauseRecording(paused) }),
+
+  /**
+   * The popup asking what is going on.
+   *
+   * It is also a good moment to notice that a recording host died — the browser does not
+   * restart to tell us, so a startup-only check would leave those chunks on disk forever.
+   * But the answer does not wait for that scan: it reads OPFS and looks up windows, and
+   * the popup was painting its Start buttons for a fraction of a second before the Stop
+   * bar replaced them. A button that appears under a cursor already moving toward it is a
+   * button pressed twice.
+   */
+  'record:status': async () => {
+    void recoverRecordings().catch((error: unknown) => {
+      console.warn('[kadr] could not recover an interrupted recording', error)
+    })
+    return await recordingStatus()
+  },
+
+  'record:events': async ({ events, viewport }, sender) => ({
+    ok: await recordEvents(events, viewport, sender),
+  }),
+
+  /**
+   * An ending the user did not ask for: Chrome's own stop-sharing bar, the recorded tab
+   * closing, or the duration limit. The clip is still written and still opened — the
+   * footage is there, and losing it because of how it ended would be indefensible.
+   */
+  'record:ended': async ({ clipId, reason, result }) => {
+    const stopKeepAlive = keepServiceWorkerAlive()
+    try {
+      const finished = await recordingEnded(clipId, result)
+      if (finished) {
+        await openClip(finished)
+        if (reason === 'limit') {
+          showDone(translate(await currentLocale(), 'record.limitReached'))
+        }
+      }
+      return { ok: true }
+    } finally {
+      stopKeepAlive()
+    }
+  },
+
+  /**
+   * The recorder window reporting how its start went. The `record:start` that opened it
+   * is still waiting on this.
+   */
+  'record:hostStarted': ({ ok, cancelled, error }) => {
+    hostStarted({
+      ok,
+      ...(cancelled === undefined ? {} : { cancelled }),
+      ...(error === undefined ? {} : { error }),
+    })
+    return { ok: true }
+  },
+
+  'clip:open': async ({ clipId }) => {
+    await openClip(clipId)
+    return { ok: true }
+  },
 
   'editor:open': async ({ docId }) => {
     await openEditor(docId)

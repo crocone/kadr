@@ -9,16 +9,18 @@
  * The rect is returned in page coordinates, not viewport ones: the element may be
  * below the fold, and the background decides whether to scroll or stitch.
  *
- * When the cursor is over a table, "copy as" chips appear next to the frame
- *. Not a separate capture mode: the user is already hovering elements,
- * and a table is just another outcome of the same pick — as text instead of a shot.
+ * Every table on the page gets a "copy as" badge the moment the overlay opens, pinned
+ * over its top-left corner. Waiting for the cursor to land on the right element was a
+ * losing game: on a dense grid the pick snaps to a cell, a scroll wrapper or a sticky
+ * header, and the badge blinked in and out before it could be clicked. Not a separate
+ * capture mode: a table is just another outcome of the same pick — text, not a shot.
  */
 import { refOf } from '@/core/dom/selector'
 import type { ElementSelectionResponse } from '@/core/messaging'
 import { formatTable, type TableFormat, type TableGrid } from '@/core/table/format'
 
 import { t } from '../i18n'
-import { closestTable, dataRowCount, readTable } from '../table/read'
+import { closestTable, dataRowCount, findTables, readTable } from '../table/read'
 
 import { createOverlayHost, describeElement, swallowPageEvents } from './host'
 
@@ -47,19 +49,33 @@ const CSS = `
     display: none;
     align-items: center;
     gap: 6px;
-    padding: 7px 9px;
+    padding: 6px 8px;
     border-radius: 10px;
     border: 1px solid rgba(255, 255, 255, 0.07);
     background: rgba(20, 21, 25, 0.96);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     pointer-events: auto;
     cursor: default;
+    /* Badges sit on top of the page content they describe, so an idle one steps back
+       until the pick reaches its table or the cursor reaches the badge itself. */
+    opacity: 0.72;
   }
-  .table b { font-weight: 600; color: #fff; margin-right: 2px; }
+  .table:hover,
+  .table[data-active] {
+    opacity: 1;
+    border-color: rgba(109, 92, 245, 0.9);
+  }
+  .table b { font-weight: 600; color: #fff; margin-right: 2px; white-space: nowrap; }
 `
 
-/** Chip bar height: decides whether it goes below the table or above it. */
-const BAR_HEIGHT = 40
+/** Gap between a badge and the table corner it is pinned to. */
+const BAR_INSET = 6
+
+/** A table showing less than this on screen has no room for a badge. */
+const BAR_MARGIN = 8
+
+/** Tables come and go with scrolling; re-scanning the whole page is not free. */
+const RESCAN_MS = 400
 
 const FORMATS: readonly TableFormat[] = ['csv', 'markdown', 'json']
 
@@ -80,6 +96,9 @@ function gridFor(table: Element, cache: TableCache): TableGrid | null {
   return cache.get(table) ?? null
 }
 
+/** A table on the page and the badge floating over it. */
+type TableBadge = { element: Element; grid: TableGrid; bar: HTMLElement }
+
 export async function selectElement(): Promise<ElementSelectionResponse> {
   const host = createOverlayHost(CSS)
   const release = swallowPageEvents(host.element)
@@ -89,13 +108,6 @@ export async function selectElement(): Promise<ElementSelectionResponse> {
   layer.innerHTML = `
     <div class="box"></div>
     <div class="tag"></div>
-    <div class="table">
-      <b></b>
-      ${FORMATS.map(
-        (format) =>
-          `<button class="chip" data-format="${format}">${FORMAT_LABELS[format]}</button>`,
-      ).join('')}
-    </div>
     <div class="card"><b>${t('overlay.element.hint')}</b> ${t('overlay.element.keys')}</div>
     <div class="keys"><span><kbd>Esc</kbd> ${t('overlay.keys.cancel')}</span></div>
   `
@@ -103,56 +115,112 @@ export async function selectElement(): Promise<ElementSelectionResponse> {
 
   const box = layer.querySelector<HTMLElement>('.box')!
   const tag = layer.querySelector<HTMLElement>('.tag')!
-  const tableBar = layer.querySelector<HTMLElement>('.table')!
-  const tableCount = layer.querySelector<HTMLElement>('.table b')!
   const hostElement = host.element
 
   return await new Promise<ElementSelectionResponse>((resolve) => {
     /** Ancestor chain from the hovered element up: the arrow keys walk it. */
     let chain: Element[] = []
     let depth = 0
-    /** Table under the cursor and its parsed grid — what the chips will copy. */
-    let table: { element: Element; grid: TableGrid } | null = null
+    /** One badge per table on the page, in document order. */
+    const badges: TableBadge[] = []
     const cache: TableCache = new WeakMap()
+    let scannedAt = 0
 
     const finish = (response: ElementSelectionResponse) => {
       release()
       host.destroy()
       window.removeEventListener('keydown', onKeyDown, true)
+      window.removeEventListener('scroll', onViewportChange, true)
+      window.removeEventListener('resize', onViewportChange)
       resolve(response)
     }
 
     const current = () => chain[depth]
 
+    /** A badge for one table: built once, then only moved. */
+    const addBadge = (element: Element): TableBadge | null => {
+      const grid = gridFor(element, cache)
+      if (!grid || dataRowCount(grid) === 0) return null
+
+      const bar = document.createElement('div')
+      bar.className = 'table'
+      bar.innerHTML = `
+        <b>${t('overlay.table.rows', { n: dataRowCount(grid) })}</b>
+        ${FORMATS.map(
+          (format) =>
+            `<button class="chip" data-format="${format}">${FORMAT_LABELS[format]}</button>`,
+        ).join('')}
+      `
+      layer.append(bar)
+
+      const badge = { element, grid, bar }
+      badges.push(badge)
+      return badge
+    }
+
     /**
-     * Chips appear only when the cursor is really over a table — itself, or exactly
-     * one inside the hovered container. In a block with three tables a "copy" button
-     * that cannot say which one is useless, so no chips there.
+     * Picks up tables that were not there when the overlay opened: virtualised grids
+     * mount on scroll, and a page-long scan on every frame is far too expensive.
      */
-    const paintTable = () => {
-      const element = current()
-      const found = element ? closestTable(element) : null
-      const grid = found ? gridFor(found, cache) : null
+    const scanTables = () => {
+      const now = Date.now()
+      if (now - scannedAt < RESCAN_MS) return
+      scannedAt = now
 
-      if (!found || !grid) {
-        table = null
-        tableBar.style.display = 'none'
-        return
+      let added = false
+      for (const element of findTables()) {
+        if (badges.some((badge) => badge.element === element)) continue
+        if (addBadge(element)) added = true
       }
+      if (added) placeBadges()
+    }
 
-      table = { element: found, grid }
-      tableCount.textContent = t('overlay.table.rows', { n: dataRowCount(grid) })
-      tableBar.style.display = 'flex'
+    /**
+     * Badges are pinned over the top-left corner of their table and clamped to the
+     * part of it that is on screen: on a grid taller than the viewport the badge stays
+     * reachable instead of scrolling away with the table's own top edge.
+     */
+    const placeBadges = () => {
+      for (let at = badges.length - 1; at >= 0; at -= 1) {
+        const badge = badges[at]!
+        if (!badge.element.isConnected) {
+          badge.bar.remove()
+          badges.splice(at, 1)
+          continue
+        }
 
-      const rect = found.getBoundingClientRect()
-      const below = rect.bottom + BAR_HEIGHT < window.innerHeight
+        const rect = badge.element.getBoundingClientRect()
+        const left = Math.max(rect.left, 0)
+        const top = Math.max(rect.top, 0)
+        const right = Math.min(rect.right, window.innerWidth)
+        const bottom = Math.min(rect.bottom, window.innerHeight)
 
-      // The bar hugs the table edge with no gap — even overlapping by a couple of
-      // pixels. A gap would be a strip of some other element on the cursor's way to
-      // the buttons: while crossing it, the pick jumps to a neighbouring paragraph
-      // and the bar disappears.
-      tableBar.style.left = `${Math.max(8, Math.min(rect.left, window.innerWidth - 320))}px`
-      tableBar.style.top = `${below ? rect.bottom - 2 : Math.max(8, rect.top - BAR_HEIGHT + 2)}px`
+        // Measured with the badge visible: a `display: none` element has no size.
+        badge.bar.style.display = 'flex'
+        const size = badge.bar.getBoundingClientRect()
+        const fits =
+          right - left >= size.width + BAR_MARGIN && bottom - top >= size.height + BAR_MARGIN
+        if (!fits) {
+          badge.bar.style.display = 'none'
+          continue
+        }
+
+        badge.bar.style.left = `${left + BAR_INSET}px`
+        badge.bar.style.top = `${top + BAR_INSET}px`
+      }
+    }
+
+    /**
+     * The badge of the table the pick is inside lights up, so it is clear which grid
+     * those buttons would copy when several sit next to each other.
+     */
+    const markActive = () => {
+      const element = current()
+      const active = element ? closestTable(element) : null
+      for (const badge of badges) {
+        if (active && badge.element.contains(active)) badge.bar.dataset.active = ''
+        else delete badge.bar.dataset.active
+      }
     }
 
     const paint = () => {
@@ -160,7 +228,6 @@ export async function selectElement(): Promise<ElementSelectionResponse> {
       if (!element) {
         box.style.display = 'none'
         tag.style.display = 'none'
-        tableBar.style.display = 'none'
         return
       }
 
@@ -177,7 +244,18 @@ export async function selectElement(): Promise<ElementSelectionResponse> {
       tag.style.left = `${Math.max(4, rect.left)}px`
       tag.style.top = `${above ? rect.top - 24 : Math.min(window.innerHeight - 24, rect.bottom + 4)}px`
 
-      paintTable()
+      markActive()
+    }
+
+    /** Scroll and resize move every table under the badges; a rescan may add more. */
+    let frame = 0
+    function onViewportChange() {
+      if (frame) return
+      frame = requestAnimationFrame(() => {
+        frame = 0
+        scanTables()
+        placeBadges()
+      })
     }
 
     const elementUnder = (x: number, y: number): Element | null => {
@@ -201,6 +279,9 @@ export async function selectElement(): Promise<ElementSelectionResponse> {
       for (let node: Element | null = found; node; node = node.parentElement) chain.push(node)
       depth = 0
       paint()
+      // A table can be rendered long after the overlay opened, without a single scroll
+      // in between — the throttle keeps this from costing anything on a still page.
+      scanTables()
     }
 
     /**
@@ -208,13 +289,12 @@ export async function selectElement(): Promise<ElementSelectionResponse> {
      * Clipboard API needs a user gesture and a focused document, and the service
      * worker has neither. The area overlay writes image copies for the same reason.
      */
-    const copyTable = async (format: TableFormat) => {
-      if (!table) return
-      const rows = dataRowCount(table.grid)
+    const copyTable = async (badge: TableBadge, format: TableFormat) => {
+      const rows = dataRowCount(badge.grid)
       let copied = true
 
       try {
-        await navigator.clipboard.writeText(formatTable(table.grid, format))
+        await navigator.clipboard.writeText(formatTable(badge.grid, format))
       } catch (error) {
         console.warn('[kadr] clipboard write failed', error)
         copied = false
@@ -227,13 +307,15 @@ export async function selectElement(): Promise<ElementSelectionResponse> {
       event.preventDefault()
       event.stopPropagation()
 
+      const bar = (event.target as Element | null)?.closest?.('.table')
       const chip = (event.target as Element | null)?.closest?.<HTMLElement>('.chip')
-      if (chip?.dataset.format) {
-        void copyTable(chip.dataset.format as TableFormat)
+      const badge = bar ? badges.find((candidate) => candidate.bar === bar) : undefined
+      if (badge && chip?.dataset.format) {
+        void copyTable(badge, chip.dataset.format as TableFormat)
         return
       }
       // A click on the bar itself, missing the buttons, must not capture what is under it.
-      if ((event.target as Element | null)?.closest?.('.table')) return
+      if (bar) return
 
       const element = current()
       if (!element) return
@@ -277,5 +359,11 @@ export async function selectElement(): Promise<ElementSelectionResponse> {
     layer.addEventListener('mousemove', onMouseMove)
     layer.addEventListener('click', onClick, true)
     window.addEventListener('keydown', onKeyDown, true)
+    window.addEventListener('scroll', onViewportChange, true)
+    window.addEventListener('resize', onViewportChange)
+
+    for (const element of findTables()) addBadge(element)
+    scannedAt = Date.now()
+    placeBadges()
   })
 }

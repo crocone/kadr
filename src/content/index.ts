@@ -6,6 +6,7 @@
 import { registerMessageHandlers } from '@/core/messaging'
 
 import { loadLocale } from './i18n'
+import { beginEventRecording, endEventRecording } from './record/events'
 import { locateElement } from './locate'
 import { selectArea } from './overlay/area'
 import { runCountdown } from './overlay/countdown'
@@ -88,6 +89,16 @@ if (!window.__kadrContentReady) {
 
     'content:scribeEnd': () => {
       endRecording()
+      return { ok: true }
+    },
+
+    'content:recordBegin': () => {
+      beginEventRecording()
+      return { ok: true }
+    },
+
+    'content:recordEnd': async () => {
+      await endEventRecording()
       return { ok: true }
     },
 

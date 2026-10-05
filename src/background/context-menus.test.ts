@@ -109,7 +109,7 @@ describe('feedbackUrlForMenuItem', () => {
   it('maps the feedback items to their links', () => {
     vi.stubGlobal('chrome', { runtime: { id: 'abc' } })
     expect(feedbackUrlForMenuItem('feedback-rate')).toBe(
-      'https://chromewebstore.google.com/detail/abc/reviews',
+      'https://chromewebstore.google.com/detail/emahpjdcneajnkjmpdegllokcllaglme/reviews',
     )
     expect(feedbackUrlForMenuItem('feedback-send')).toMatch(/^https:/)
     expect(feedbackUrlForMenuItem('capture-area')).toBeUndefined()

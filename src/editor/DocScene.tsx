@@ -30,6 +30,7 @@ import { withAlpha } from '@/core/render/color'
 import { OVERLAY_NAME } from '@/core/render/export'
 import { cssFilterString, isNeutral } from '@/core/render/filters'
 import { coverRect } from '@/core/render/fit'
+import { gradientLine } from '@/core/render/paint'
 import {
   makeTile,
   MESH_BLOBS,
@@ -39,7 +40,7 @@ import {
 } from '@/core/render/wallpaper'
 
 import { LayerNode } from './layers/LayerNode'
-import { decorationScene } from './scene/decoration'
+import { decorationScene } from '@/core/render/decoration'
 
 /**
  * Document content. A separate component because it renders both the preview and the
@@ -343,20 +344,6 @@ function BackgroundShape({ doc, image }: { doc: Doc; image: HTMLImageElement | n
   )
 }
 
-/** Angle in degrees → start and end points across the canvas diagonal. */
-function gradientPoints(canvas: Doc['canvas'], angle: number) {
-  const radians = (angle * Math.PI) / 180
-  const dx = Math.cos(radians)
-  const dy = Math.sin(radians)
-  const half = { x: canvas.w / 2, y: canvas.h / 2 }
-  const reach = Math.abs(dx) * half.x + Math.abs(dy) * half.y
-
-  return {
-    start: { x: half.x - dx * reach, y: half.y - dy * reach },
-    end: { x: half.x + dx * reach, y: half.y + dy * reach },
-  }
-}
-
 function GradientRect({
   canvas,
   background,
@@ -364,7 +351,7 @@ function GradientRect({
   canvas: Doc['canvas']
   background: GradientBackground
 }) {
-  const { start, end } = gradientPoints(canvas, background.angle)
+  const { start, end } = gradientLine(canvas.w, canvas.h, background.angle)
   return (
     <Rect
       x={0}
@@ -392,7 +379,7 @@ function Wallpaper({
   canvas: Doc['canvas']
   background: WallpaperBackground
 }) {
-  const { start, end } = gradientPoints(canvas, background.angle)
+  const { start, end } = gradientLine(canvas.w, canvas.h, background.angle)
   const tile = useMemo(
     () => makeTile(background.pattern, background.to),
     [background.pattern, background.to],

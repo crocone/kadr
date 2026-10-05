@@ -22,6 +22,14 @@ const GRID_ROLES = ['table', 'grid', 'treegrid']
 const MAX_ROWS = 2000
 const MAX_COLUMNS = 200
 
+/** Badges for more tables than this turn the page into a wall of chips. */
+const MAX_TABLES = 24
+
+/** A table narrower or shorter than this is a layout trick, not data. */
+const MIN_SIZE = 60
+
+const TABLE_SELECTOR = 'table, [role="table"], [role="grid"], [role="treegrid"]'
+
 export function isTableLike(element: Element): boolean {
   if (element.tagName === 'TABLE') return true
   const role = element.getAttribute('role')
@@ -45,8 +53,48 @@ export function closestTable(element: Element | null): Element | null {
   }
 
   if (!element) return null
-  const inside = element.querySelectorAll('table, [role="table"], [role="grid"], [role="treegrid"]')
+  const inside = element.querySelectorAll(TABLE_SELECTOR)
   return inside.length === 1 ? inside[0]! : null
+}
+
+/**
+ * Every table on the page worth a copy badge, in document order.
+ *
+ * Only the outermost one of a nest is kept: a table used for layout with a real table
+ * inside would otherwise get a badge of its own, and both would copy the same data.
+ *
+ * Size is checked only when the page has actually been laid out — under jsdom every
+ * rect is zero, and dropping tables there would mean dropping all of them.
+ */
+export function findTables(root: ParentNode = document): Element[] {
+  const tables: Element[] = []
+
+  for (const element of root.querySelectorAll(TABLE_SELECTOR)) {
+    if (tables.some((kept) => kept.contains(element))) continue
+    if (!isVisible(element)) continue
+
+    const rect = element.getBoundingClientRect()
+    const laidOut = rect.width > 0 || rect.height > 0
+    if (laidOut && (rect.width < MIN_SIZE || rect.height < MIN_SIZE)) continue
+
+    tables.push(element)
+    if (tables.length >= MAX_TABLES) break
+  }
+
+  return tables
+}
+
+/**
+ * `checkVisibility` also answers for ancestors — a table inside a collapsed accordion
+ * is hidden without any attribute of its own. Where it is missing, the element's own
+ * styles are all we can look at.
+ */
+function isVisible(element: Element): boolean {
+  const check = (element as { checkVisibility?: (options: object) => boolean }).checkVisibility
+  if (typeof check === 'function') {
+    return check.call(element, { contentVisibilityAuto: true, visibilityProperty: true })
+  }
+  return !isHidden(element)
 }
 
 function isHidden(element: Element): boolean {

@@ -19,6 +19,9 @@ import {
   shelfQuery,
   setDocTags,
 } from '@/core/storage/library'
+import { deleteClipFile } from '@/core/record/opfs'
+import type { Clip } from '@/core/record/types'
+import { deleteClip, deleteImage, listClips } from '@/core/storage/db'
 import { readSettings } from '@/core/storage/settings'
 import { renderDocBlob } from '@/guide/render'
 import { useApp } from '@/core/ui/app-context'
@@ -27,6 +30,7 @@ import { cn } from '@/core/ui/cn'
 import { Button } from '@/core/ui/components'
 import { IconGrid, IconLibrary, IconList, IconSearch, IconSettings } from '@/core/ui/icons'
 
+import { ClipCard } from './ClipCard'
 import { SelectionBar } from './SelectionBar'
 import { ShotCard } from './ShotCard'
 import { ShotRow } from './ShotRow'
@@ -48,6 +52,8 @@ type View = 'grid' | 'list'
 export function Library() {
   const { t, locale } = useApp()
   const [docs, setDocs] = useState<StoredDoc[]>([])
+  /** Recordings. Their own store, their own shelf — see `shelfQuery('media')`. */
+  const [clips, setClips] = useState<Clip[]>([])
   const [loaded, setLoaded] = useState(false)
   const [text, setText] = useState('')
   const [shelf, setShelf] = useState<Shelf>('all')
@@ -68,6 +74,7 @@ export function Library() {
       setDocs(found)
       setLoaded(true)
     })
+    void listClips().then(setClips)
   }, [])
 
   useEffect(() => {
@@ -95,7 +102,33 @@ export function Library() {
 
   const domainFacets = useMemo(() => collectDomains(docs), [docs])
   const tagFacets = useMemo(() => collectTags(docs), [docs])
-  const counts = useMemo(() => shelfCounts(docs, now), [docs, now])
+  const counts = useMemo(() => shelfCounts(docs, now, clips.length), [docs, now, clips.length])
+
+  // Recordings are searched by the same box, over the little text they have: a title
+  // and a domain. There is no OCR on a video and no tags on a clip yet.
+  const foundClips = useMemo(() => {
+    const needle = text.trim().toLowerCase()
+    if (!needle) return clips
+    return clips.filter((clip) =>
+      `${clip.title} ${clip.page?.domain ?? ''}`.toLowerCase().includes(needle),
+    )
+  }, [clips, text])
+
+  /**
+   * Removing a clip is a file, maybe a poster, and a record — in two storages with no
+   * transaction between them. Same order as in the clip editor: the record goes last,
+   * so a half-finished delete leaves wasted bytes rather than a card that cannot open.
+   */
+  const dropClip = (clip: Clip) => {
+    if (!window.confirm(t('library.delete.confirm', { title: clip.title }))) return
+    setClips((current) => current.filter((other) => other.id !== clip.id))
+
+    void (async () => {
+      await deleteClipFile(clip.file)
+      if (clip.poster) await deleteImage(clip.poster)
+      await deleteClip(clip.id)
+    })()
+  }
 
   const found = useMemo(
     () => searchDocs(docs, { text, domains, tags, ...shelfQuery(shelf, now) }),
@@ -255,7 +288,7 @@ export function Library() {
         </span>
         <h1 className="text-base font-semibold">{t('library.title')}</h1>
         <span className="font-mono text-[11px] tracking-[0.08em] text-text-muted uppercase">
-          {t('library.count', { n: found.length })}
+          {t('library.count', { n: shelf === 'media' ? foundClips.length : found.length })}
         </span>
 
         <label className="relative ml-auto w-80">
@@ -341,7 +374,30 @@ export function Library() {
         <main className="flex-1 overflow-y-auto p-5">
           {reshoot.error ? <p className="mb-3 text-xs text-danger">{t(reshoot.error)}</p> : null}
 
-          {found.length === 0 && loaded ? (
+          {shelf === 'media' ? (
+            foundClips.length === 0 ? (
+              <div className="flex h-full flex-col items-center justify-center gap-2 text-center">
+                <p className="text-sm text-text-soft">{t('library.clips.empty')}</p>
+                <p className="text-xs text-text-muted">{t('library.clips.empty.hint')}</p>
+              </div>
+            ) : (
+              <ul className="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-4">
+                {foundClips.map((clip) => (
+                  <ClipCard
+                    key={clip.id}
+                    clip={clip}
+                    timeFormat={timeFormat}
+                    onOpen={() => {
+                      void sendMessage('clip:open', { clipId: clip.id })
+                    }}
+                    onDelete={() => {
+                      dropClip(clip)
+                    }}
+                  />
+                ))}
+              </ul>
+            )
+          ) : found.length === 0 && loaded ? (
             <div className="flex h-full flex-col items-center justify-center gap-2 text-center">
               <p className="text-sm text-text-soft">
                 {nothingAtAll ? t('library.empty') : t('library.nothingFound')}

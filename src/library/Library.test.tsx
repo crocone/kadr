@@ -105,7 +105,11 @@ describe('Library', () => {
     expect(screen.getByTitle('Dashboard')).toBeDefined()
   })
 
-  it('says nothing about video until there is video to show', async () => {
+  /**
+   * Recordings live in their own store, so the shelf swaps the feed instead of
+   * filtering it. Showing a shot there would mean the shelf is lying about what it is.
+   */
+  it('shows no shots on the recordings shelf', async () => {
     await putDoc(storedDoc({ id: 'doc_a', title: 'Dashboard' }))
 
     renderLibrary()
@@ -113,9 +117,12 @@ describe('Library', () => {
       expect(screen.getByTitle('Dashboard')).toBeDefined()
     })
 
-    expect(screen.getByRole<HTMLButtonElement>('button', { name: /Video and GIF/ }).disabled).toBe(
-      true,
-    )
+    await userEvent.click(screen.getByRole('button', { name: /Recordings/ }))
+
+    await waitFor(() => {
+      expect(screen.queryByTitle('Dashboard')).toBeNull()
+    })
+    expect(screen.getByText('No recordings yet')).toBeDefined()
   })
 
   it('breaks the feed into days', async () => {

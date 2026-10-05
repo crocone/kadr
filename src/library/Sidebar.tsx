@@ -1,11 +1,5 @@
 import type { MessageKey } from '@/core/i18n'
-import {
-  type Facet,
-  isShelfReady,
-  type Shelf,
-  SHELVES,
-  type ShelfCounts,
-} from '@/core/storage/library'
+import { type Facet, type Shelf, SHELVES, type ShelfCounts } from '@/core/storage/library'
 import { useT } from '@/core/ui/app-context'
 import { cn } from '@/core/ui/cn'
 import { Button } from '@/core/ui/components'
@@ -47,14 +41,11 @@ export function Sidebar({
     <aside className="flex w-[240px] shrink-0 flex-col gap-5 overflow-y-auto border-r border-border p-4">
       <ul className="flex flex-col gap-0.5">
         {SHELVES.map((value) => {
-          const ready = isShelfReady(value)
           return (
             <li key={value}>
               <button
                 type="button"
-                disabled={!ready}
                 aria-current={shelf === value}
-                title={ready ? undefined : t('popup.record.soon')}
                 onClick={() => {
                   onShelf(value)
                 }}

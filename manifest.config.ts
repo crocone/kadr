@@ -44,6 +44,8 @@ export default defineManifest({
     'storage',
     'unlimitedStorage',
     'downloads',
+    // Tab recording runs in an offscreen document outside the service worker.
+    'offscreen',
     // The content script writes to the clipboard on an overlay button click; without
     // this permission a page's own permissions-policy could deny it.
     'clipboardWrite',
@@ -55,12 +57,14 @@ export default defineManifest({
   // must either be a required permission with an install-time warning or not exist —
   // to be decided in phase 4; until then it's absent.
   //
-  // There is no `optional_permissions` at all in v1.0, and that is deliberate. `tabCapture`
-  // and `desktopCapture` belong to the recorder, which is phase 7 and ships as a separate
-  // update to an already-approved extension; `tabs` belongs to the multi-tab
-  // batch capture, which is not written either. An optional permission that no call site
-  // ever requests is a question at review with no answer behind it — and for these two
-  // in particular, the answer costs weeks of moderation.
+  // The two recording permissions are optional and asked for on the first press of
+  // "record", never at install. That was the whole reason recording shipped as a
+  // separate update rather than part of v1.0: `tabCapture` in the install dialog reads
+  // as "this extension can watch everything you do", and it would have been in front of
+  // every reviewer and every visitor to the listing from day one.
+  //
+  // `tabs` is still absent: multi-tab batch capture is not written.
+  optional_permissions: ['tabCapture', 'desktopCapture'],
 
   optional_host_permissions: ['<all_urls>'],
 

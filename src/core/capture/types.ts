@@ -43,6 +43,13 @@ export type CaptureError =
   | 'capture-failed'
   /** Reshoot did not find the recorded element on the page: see `core/dom/selector`. */
   | 'element-not-found'
+  /** Screen recording: the optional permission was declined or the source picker dismissed. */
+  | 'no-recording-permission'
+  /** Not enough room in the origin private file system to hold a recording. */
+  | 'no-space'
+  | 'already-recording'
+  /** Chrome refused to hand over a capture stream for this tab. */
+  | 'tab-capture-refused'
 
 export class CaptureFailure extends Error {
   constructor(

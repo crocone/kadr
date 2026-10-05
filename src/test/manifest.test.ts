@@ -21,17 +21,26 @@ describe('manifest', () => {
   })
 
   /**
-   * v1.0 ships without the recorder, so it ships without the permissions the recorder
-   * would need — in either list. Declaring them early costs a heavier first review and
-   * buys nothing, because no call site requests them. Phase 7 puts
-   * `tabCapture` and `desktopCapture` back into optional_*, and the batch capture puts
-   * `tabs` there; until then this test is what keeps them out.
+   * The recorder's permissions are optional and stay optional. Required, they would put
+   * "read everything on your screen" in the install dialog of an extension that mostly
+   * takes screenshots — which is exactly why recording shipped as a later update rather
+   * than as part of v1.0.
    */
-  it('declares no permission the code never requests', () => {
-    for (const permission of ['tabCapture', 'desktopCapture', 'tabs']) {
+  it('keeps the recording permissions optional', () => {
+    for (const permission of ['tabCapture', 'desktopCapture']) {
       expect(manifest.permissions).not.toContain(permission)
-      expect(manifest.optional_permissions ?? []).not.toContain(permission)
+      expect(manifest.optional_permissions ?? []).toContain(permission)
     }
+  })
+
+  it('allows the offscreen document that hosts tab recordings', () => {
+    expect(manifest.permissions).toContain('offscreen')
+  })
+
+  /** Multi-tab batch capture is not written, so nothing asks for `tabs`. */
+  it('declares no permission the code never requests', () => {
+    expect(manifest.permissions).not.toContain('tabs')
+    expect(manifest.optional_permissions ?? []).not.toContain('tabs')
   })
 
   /**

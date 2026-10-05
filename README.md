@@ -6,13 +6,14 @@ or a PRO lock.
 
 ## What it is meant to be
 
-|             |                                                                                                                                                                                                              |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Capture     | Full page, visible area, drag-selected region, DOM element, and a scrolling capture that stitches a chat or a virtualised feed by content instead of coordinates. Inner scroll containers, responsive series |
-| Editor      | One Konva document renders both the preview and the export, so what you see is what you get. Undo/redo covers the whole document, not just the drawing panel                                                 |
-| Annotations | Numbered step badges, seven arrow styles, spotlight, highlight, and blur that stays a movable layer instead of burning into pixels                                                                           |
-| Privacy     | No telemetry. No backend. Screenshots stay on the device unless you explicitly run an AI action with your own key                                                                                            |
-| AI          | Bring your own key — Anthropic, OpenAI, Google, or any OpenAI-compatible endpoint including a local Ollama or LM Studio. A key-free local OCR mode covers PII redaction offline                              |
+|             |                                                                                                                                                                                                                                                                           |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Capture     | Full page, visible area, drag-selected region, DOM element, and a scrolling capture that stitches a chat or a virtualised feed by content instead of coordinates. Inner scroll containers, responsive series                                                              |
+| Editor      | One Konva document renders both the preview and the export, so what you see is what you get. Undo/redo covers the whole document, not just the drawing panel                                                                                                              |
+| Annotations | Numbered step badges, seven arrow styles, spotlight, highlight, and blur that stays a movable layer instead of burning into pixels                                                                                                                                        |
+| Recording   | Tab, window or whole screen into an offscreen document, chunked to OPFS so a crash costs seconds rather than the take. The clip editor trims, cuts the dead air, and moves a camera that leans in on the clicks; export is WebM, MP4 or GIF with no ffmpeg in the package |
+| Privacy     | No telemetry. No backend. Screenshots stay on the device unless you explicitly run an AI action with your own key                                                                                                                                                         |
+| AI          | Bring your own key — Anthropic, OpenAI, Google, or any OpenAI-compatible endpoint including a local Ollama or LM Studio. A key-free local OCR mode covers PII redaction offline                                                                                           |
 
 ## Install from source
 
@@ -76,9 +77,9 @@ The base install asks for `activeTab`, `scripting`, `storage`, `unlimitedStorage
 by clicking the toolbar icon, a context-menu item or pressing a hotkey, which happens to
 be every way capture starts.
 
-Everything heavier is optional and requested only when the matching feature is switched on:
-`tabCapture` / `desktopCapture` for recording, `tabs` for multi-tab batch capture, and host
-access for the issue tracker you configured — asked for at the moment you press Send.
+Everything heavier is optional and asked for on the button that needs it: `tabCapture` and
+`desktopCapture` on the first press of Record, and host access for the issue tracker you
+configured at the moment you press Send. Nothing requests them at install time.
 
 ## Release
 

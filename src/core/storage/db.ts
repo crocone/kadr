@@ -6,11 +6,13 @@ import { type DBSchema, type IDBPDatabase, openDB } from 'idb'
 
 import type { StylePreset } from '@/core/doc/style-presets'
 import type { Doc, DocId, ImageId } from '@/core/doc/types'
+import { upgradeClip } from '@/core/record/defaults'
+import type { Clip, ClipId } from '@/core/record/types'
 import type { GuideId, ScribeSession, ScribeStep, StepId } from '@/core/scribe/timeline'
 
 export const DB_NAME = 'kadr'
-/** 2 — Scribe: recorded steps and built guides. */
-export const DB_VERSION = 2
+/** 2 — Scribe: recorded steps and built guides. 3 — screen recordings. */
+export const DB_VERSION = 3
 
 export type StoredImage = {
   id: ImageId
@@ -70,6 +72,16 @@ export interface KadrDB extends DBSchema {
     value: ScribeStep
     indexes: { 'by-guide': GuideId }
   }
+  /**
+   * Screen recordings — the record only. The video itself is a file in OPFS, and this
+   * store keeps the name of it along with the edit, the event timeline and the numbers
+   * the library card shows.
+   */
+  clips: {
+    key: ClipId
+    value: Clip
+    indexes: { 'by-updatedAt': number }
+  }
 }
 
 let dbPromise: Promise<IDBPDatabase<KadrDB>> | null = null
@@ -98,6 +110,11 @@ export function getDb(): Promise<IDBPDatabase<KadrDB>> {
 
         const steps = db.createObjectStore('steps', { keyPath: 'id' })
         steps.createIndex('by-guide', 'guideId')
+      }
+
+      if (oldVersion < 3) {
+        const clips = db.createObjectStore('clips', { keyPath: 'id' })
+        clips.createIndex('by-updatedAt', 'updatedAt')
       }
     },
   })
@@ -195,6 +212,33 @@ export async function listSteps(guideId: GuideId): Promise<ScribeStep[]> {
 
 export async function deleteStep(id: StepId): Promise<void> {
   return (await getDb()).delete('steps', id)
+}
+
+export async function putClip(clip: Clip): Promise<ClipId> {
+  return (await getDb()).put('clips', clip)
+}
+
+export async function getClip(id: ClipId): Promise<Clip | undefined> {
+  const clip = await (await getDb()).get('clips', id)
+  return clip && upgradeClip(clip)
+}
+
+/** Newest first, like the shot library. */
+export async function listClips(): Promise<Clip[]> {
+  const clips = await (await getDb()).getAllFromIndex('clips', 'by-updatedAt')
+  return clips.reverse().map(upgradeClip)
+}
+
+/**
+ * Removes the record and reports what else has to go: the video file lives in OPFS and
+ * the poster in the image store, and neither is reachable from a transaction here.
+ * Returning them beats deleting them behind the caller's back — the caller is the only
+ * one that can tell whether the delete is the user's or a rollback.
+ */
+export async function deleteClip(id: ClipId): Promise<{ file: string; poster: ImageId | null }> {
+  const clip = await getClip(id)
+  await (await getDb()).delete('clips', id)
+  return { file: clip?.file ?? '', poster: clip?.poster ?? null }
 }
 
 /**

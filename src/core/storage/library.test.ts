@@ -11,7 +11,6 @@ import {
   dayOffset,
   groupByDay,
   imageIdsOf,
-  isShelfReady,
   matchesQuery,
   normalizeTag,
   removeDoc,
@@ -101,8 +100,11 @@ describe('shelves', () => {
     expect(shelfCounts(docs, now)).toEqual({ all: 3, today: 2, media: 0, annotated: 1 })
   })
 
-  it('leaves the media shelf empty until there is video to put on it', () => {
-    expect(isShelfReady('media')).toBe(false)
+  it('counts recordings on the media shelf, since they are not documents', () => {
+    expect(shelfCounts(docs, now, 4).media).toBe(4)
+  })
+
+  it('keeps shots off the media shelf: it is a clip list, not a filter over the feed', () => {
     expect(searchDocs(docs, shelfQuery('media', now))).toEqual([])
   })
 

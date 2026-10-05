@@ -1,6 +1,12 @@
-import { Button } from '@/core/ui/components'
+import { Button } from './components'
 
-/** Zoom bar over the stage: mouse wheel for zooming, buttons for exact values. */
+/**
+ * Zoom bar over a canvas: mouse wheel for zooming, buttons for exact values.
+ *
+ * Shared by the screenshot editor and the clip editor — the same control over the same
+ * problem, which is that neither a long page nor a 4K recording fits a panel at its own
+ * size, and both need a way back to 100% to check a detail.
+ */
 export function ZoomBar({
   zoom,
   labels,

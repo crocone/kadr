@@ -20,7 +20,7 @@ import { CROP_REGION_ID, DocScene } from './DocScene'
 import { SelectionFrame, type TransformBox } from './layers/SelectionFrame'
 import { TextEditor } from './TextEditor'
 import type { ToolController } from './useTool'
-import { ZoomBar } from './ZoomBar'
+import { ZoomBar } from '@/core/ui/ZoomBar'
 
 /**
  * The stage fills the panel; the document moves inside it via zoom and pan.

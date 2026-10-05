@@ -37,6 +37,12 @@ export type Settings = {
   tracker: TrackerKind
   /** Tracker tokens. Same place and same reason as the AI key: local only. */
   trackers: Record<TrackerKind, TrackerConfig>
+  /**
+   * Whether a recording takes the microphone along. On by default: a screen recording
+   * with nobody talking over it is the exception, and a checkbox nobody notices was how
+   * every first recording came out silent.
+   */
+  recordMicrophone: boolean
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -54,6 +60,7 @@ export const DEFAULT_SETTINGS: Settings = {
   aiKey: '',
   tracker: 'github',
   trackers: { github: EMPTY_TRACKER, linear: EMPTY_TRACKER, jira: EMPTY_TRACKER },
+  recordMicrophone: true,
 }
 
 const STORAGE_KEY = 'settings'

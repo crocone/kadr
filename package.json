@@ -24,8 +24,10 @@
     "zip:source": "node scripts/zip.mjs --source"
   },
   "dependencies": {
+    "gifenc": "^1.0.3",
     "idb": "^8.0.3",
     "konva": "^10.3.2",
+    "mediabunny": "^1.55.5",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-konva": "^19.2.5",

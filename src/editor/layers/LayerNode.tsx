@@ -21,7 +21,7 @@ import { withAlpha } from '@/core/render/color'
 import { documentRectToImageRect } from '@/core/render/fit'
 
 import { DimWithHole } from '../DocScene'
-import { decorationScene } from '../scene/decoration'
+import { decorationScene } from '@/core/render/decoration'
 import { useStoredImage } from '../useStoredImage'
 
 export type LayerNodeProps = {

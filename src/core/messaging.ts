@@ -4,21 +4,22 @@
  * place that has to handle it.
  */
 import type { RollDirection } from '@/core/capture/rolling'
-import type { PageMetrics } from '@/core/capture/types'
+import type { CaptureError, PageMetrics } from '@/core/capture/types'
 import type { DocId, Rect } from '@/core/doc/types'
 import type { ElementRef } from '@/core/dom/selector'
+import type { RecordEvent } from '@/core/record/timeline'
+import type { ClipId, RecordSource } from '@/core/record/types'
 import type { GuideId, ScribeEvent } from '@/core/scribe/timeline'
 import type { TableFormat } from '@/core/table/format'
 
 export type CaptureMode = 'fullPage' | 'visible' | 'area' | 'element' | 'scroll'
 
-export type CaptureErrorCode =
-  | 'unsupported-page'
-  | 'cancelled'
-  | 'no-active-tab'
-  | 'content-unreachable'
-  | 'capture-failed'
-  | 'element-not-found'
+/**
+ * The same list `CaptureFailure` throws, under the name the message layer uses. It was
+ * written out twice for a while, and the copies drifted the first time a reason was
+ * added — an alias cannot.
+ */
+export type CaptureErrorCode = CaptureError
 
 export const CAPTURE_MODES: readonly CaptureMode[] = [
   'fullPage',
@@ -134,6 +135,49 @@ export type ReshootOutcome =
  */
 export type FindElementResponse =
   { ok: true; rect: Rect; similarity: number } | { ok: false; reason: 'not-found' }
+
+/**
+ * State of the recording in progress, as the popup and the page HUD see it. Elapsed
+ * time is not in here on purpose: it is `Date.now() - startedAt` minus the pauses, and
+ * a number sent once would be stale before it was drawn.
+ */
+export type RecordStatus = {
+  recording: boolean
+  clipId: ClipId | null
+  source: RecordSource | null
+  startedAt: number | null
+  paused: boolean
+  /** Ms already recorded before the current run — the sum of the parts before each pause. */
+  before: number
+  /** Automatic stop, ms. The HUD counts down to it. */
+  limit: number
+}
+
+/**
+ * What the offscreen document has to say once the file is on disk. The frame is a data
+ * URL rather than a blob: messages are structured-cloned through the extension bus, and
+ * a `Blob` does not survive the trip.
+ */
+export type RecordResult = {
+  file: string
+  size: number
+  duration: number
+  /**
+   * Wall clock at the moment the recorder actually stopped.
+   *
+   * This is the anchor that puts the event timeline in step with the video. The encoder
+   * warms up for a few hundred milliseconds after `start()`, so the file is shorter than
+   * the wall-clock span and its zero point is later than the moment we began counting.
+   * The end, though, is exact — so `stoppedAt - duration` is where the file really
+   * begins, and the whole timeline is shifted onto that.
+   */
+  stoppedAt: number
+  width: number
+  height: number
+  poster: string | null
+  mime: string
+  audio: boolean
+}
 
 export type MessageMap = {
   /**
@@ -300,15 +344,151 @@ export type MessageMap = {
     response: { ok: true }
   }
 
+  /**
+   * Screen recording: start capturing the tab, a window, or the whole screen.
+   *
+   * The `tabCapture` permission is optional and asked for on this same click — a
+   * heavy permission requested at install time is a listing nobody accepts. The site
+   * permission is asked for alongside it and may be refused: without it the event
+   * timeline dies at the first navigation, and the clip is still a clip, just without
+   * auto-zoom past that point.
+   */
+  'record:start': {
+    request: { source: RecordSource; tabId?: number; microphone?: boolean }
+    response: { ok: true; clipId: ClipId } | { ok: false; error: CaptureErrorCode }
+  }
+  'record:stop': {
+    request: Record<string, never>
+    response: { ok: true; clipId: ClipId | null }
+  }
+  'record:pause': {
+    request: { paused: boolean }
+    response: { ok: true; paused: boolean }
+  }
+  /** Asked by the popup and by the HUD after a navigation re-injects the script. */
+  'record:status': {
+    request: Record<string, never>
+    response: RecordStatus
+  }
+  /**
+   * A batch of page events. Batched, not one per event: the cursor is sampled 25 times
+   * a second, and a message round trip per sample would cost more than the recording.
+   *
+   * Times arrive as wall clock and are converted to recording time by the worker. The
+   * page cannot do it itself: it does not know about pauses, and seconds that are not in
+   * the file must not be in the timeline either.
+   */
+  'record:events': {
+    request: {
+      events: RecordEvent[]
+      /**
+       * Viewport the coordinates were measured against, in CSS pixels. The worker needs
+       * it because the recorded frame is not always the same rectangle as the page: a
+       * capture stream of a different aspect fits the page inside and pads the rest, and
+       * without the page's own size there is no way to tell the two apart.
+       */
+      viewport: { w: number; h: number }
+    }
+    response: { ok: true } | { ok: false }
+  }
+
+  /**
+   * Start recording page events. No HUD comes with it, deliberately: a tab capture
+   * records the page, and anything the extension draws on that page is in the video for
+   * good. The badge says REC and the popup stops it.
+   */
+  'content:recordBegin': {
+    request: Record<string, never>
+    response: { ok: true }
+  }
+  'content:recordEnd': {
+    request: Record<string, never>
+    response: { ok: true }
+  }
+
+  // --- Messages to whichever document is hosting the recorder ---
+
+  /**
+   * The service worker cannot hold a MediaRecorder: MV3 suspends it and the recording
+   * would stop mid-sentence. So everything from `getUserMedia` to the last chunk happens
+   * in a document — the offscreen one for a tab, and the picker window for a window or a
+   * screen, because Chrome will only let the frame that opened the source dialog open the
+   * stream behind it.
+   */
+  'recorder:start': {
+    request: {
+      clipId: ClipId
+      /**
+       * Stream to record, or `null` to let the offscreen document choose one itself.
+       *
+       * A tab stream is negotiated by the worker, because `chrome.tabCapture` lives
+       * there. A window or a screen cannot be: `chooseDesktopMedia` demands a target tab
+       * when called from a service worker, and an id issued against a tab may only be
+       * used by frames inside that tab — never by an offscreen document. Asked for from
+       * here instead, with no tab, the id belongs to the extension and the document that
+       * asked can actually open it.
+       */
+      streamId: string | null
+      source: RecordSource
+      /** Tab audio: kept playing to the user as well, or the page goes silent while recording. */
+      audio: boolean
+      microphone: boolean
+    }
+    response: { ok: true } | { ok: false; error: string; cancelled?: boolean }
+  }
+  'recorder:stop': {
+    request: Record<string, never>
+    response: { ok: true; result: RecordResult } | { ok: false; error: string }
+  }
+  'recorder:pause': {
+    request: { paused: boolean }
+    response: { ok: true; paused: boolean }
+  }
+  /**
+   * Salvage the parts of a recording whose session died. In a document rather than in the
+   * worker because reading a duration and a poster frame out of a file needs a `<video>`
+   * element, and the worker has no DOM.
+   */
+  'recorder:recover': {
+    request: { clipId: ClipId }
+    response: { ok: true; result: RecordResult } | { ok: false; error: string }
+  }
+  /**
+   * The recording ended without us asking: Chrome's own "stop sharing" button, the
+   * recorded tab closed, or the duration limit ran out. Sent from the offscreen
+   * document to the worker, which finishes the clip exactly as it would on a normal stop.
+   */
+  'record:ended': {
+    request: { clipId: ClipId; reason: 'source-ended' | 'limit' | 'error'; result?: RecordResult }
+    response: { ok: true }
+  }
+
+  /**
+   * The recorder window reporting how its start went.
+   *
+   * It picks the source and opens the stream itself, so the worker learns both at once.
+   * `cancelled` means the dialog was dismissed — an answer, not a failure.
+   */
+  'record:hostStarted': {
+    request: { clipId: ClipId; ok: boolean; cancelled?: boolean; error?: string }
+    response: { ok: true }
+  }
+
+  /** Open the clip editor on a recording. */
+  'clip:open': {
+    request: { clipId: ClipId }
+    response: { ok: true }
+  }
+
   /** Open the shot library in its own tab. */
   'library:open': {
     request: Record<string, never>
     response: { ok: true }
   }
-  /** Liveness check of the content script before injecting a second copy. */
+  /** Liveness check of extension contexts, including the content script before reinjection. */
   ping: {
     request: Record<string, never>
-    response: { ok: true; from: 'background' | 'content' }
+    response: { ok: true; from: 'background' | 'content' | 'offscreen' }
   }
 }
 

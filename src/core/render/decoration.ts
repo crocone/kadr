@@ -11,12 +11,16 @@
  * bodies are someone else's industrial designs, and a metal gradient with the
  * right proportions reads as a phone just as well.
  *
+ * The painter takes a structural context rather than Konva's, so the same code draws the
+ * chrome around a screenshot in the editor's scene graph and around a video frame in the
+ * clip renderer, thirty times a second. Konva's `Context` satisfies the shape by
+ * accident of its API; a plain `CanvasRenderingContext2D` needs the one-line adapter
+ * below.
+ *
  * Only the outer silhouette casts the document shadow. Konva puts the shadow on
  * the context before calling the painter, so every later fill would cast one of
  * its own — a traffic light with a drop shadow is how a mockup starts looking fake.
  */
-import type Konva from 'konva'
-
 import {
   BASE,
   BUTTON_DEPTH,
@@ -29,6 +33,37 @@ import {
 } from '@/core/doc/frames'
 import type { DeviceMaterial, DeviceSpec } from '@/core/doc/frames'
 import type { BrowserFrame, Decoration, DeviceMockup } from '@/core/doc/types'
+
+/**
+ * What the painter needs from a drawing surface, spelled out rather than derived.
+ *
+ * Konva's `Context` is not a `CanvasRenderingContext2D` — it wraps one and forwards a
+ * subset — so deriving the type from the DOM one would demand members it does not have.
+ * Listing what is actually called keeps both surfaces valid: the editor passes Konva's
+ * context, the clip renderer passes a real one through `paintDecoration`.
+ */
+export type PainterContext = {
+  save: () => void
+  restore: () => void
+  beginPath: () => void
+  closePath: () => void
+  moveTo: (x: number, y: number) => void
+  lineTo: (x: number, y: number) => void
+  quadraticCurveTo: (cx: number, cy: number, x: number, y: number) => void
+  arc: (x: number, y: number, radius: number, from: number, to: number, counter?: boolean) => void
+  rect: (x: number, y: number, w: number, h: number) => void
+  clip: () => void
+  fill: () => void
+  stroke: () => void
+  fillText: (text: string, x: number, y: number) => void
+  createLinearGradient: (x0: number, y0: number, x1: number, y1: number) => CanvasGradient
+  drawImage: (image: CanvasImageSource, ...rest: number[]) => void
+  /** Konva tracks canvas state itself and demands its setter; a raw context takes assignment. */
+  setAttr: (name: string, value: unknown) => void
+}
+
+/** Only the two dimensions are read off the shape, so this is all the painter needs. */
+export type PainterShape = { width: () => number; height: () => number }
 
 type Palette = {
   /** Tab strip, the topmost row. */
@@ -108,7 +143,7 @@ const GLASS = '#101318'
 const CUTOUT = '#000000'
 
 function roundedRect(
-  context: Konva.Context,
+  context: PainterContext,
   x: number,
   y: number,
   w: number,
@@ -133,7 +168,7 @@ function roundedRect(
 }
 
 function fillRounded(
-  context: Konva.Context,
+  context: PainterContext,
   color: string | CanvasGradient,
   x: number,
   y: number,
@@ -147,7 +182,7 @@ function fillRounded(
 }
 
 function strokeRounded(
-  context: Konva.Context,
+  context: PainterContext,
   color: string,
   width: number,
   x: number,
@@ -162,7 +197,7 @@ function strokeRounded(
   context.stroke()
 }
 
-function line(context: Konva.Context, color: string, width: number, points: [number, number][]) {
+function line(context: PainterContext, color: string, width: number, points: [number, number][]) {
   const [first, ...rest] = points
   if (!first) return
 
@@ -176,7 +211,7 @@ function line(context: Konva.Context, color: string, width: number, points: [num
   context.stroke()
 }
 
-function dot(context: Konva.Context, color: string, x: number, y: number, r: number) {
+function dot(context: PainterContext, color: string, x: number, y: number, r: number) {
   context.beginPath()
   context.arc(x, y, r, 0, Math.PI * 2)
   context.setAttr('fillStyle', color)
@@ -184,7 +219,7 @@ function dot(context: Konva.Context, color: string, x: number, y: number, r: num
 }
 
 function label(
-  context: Konva.Context,
+  context: PainterContext,
   text: string,
   x: number,
   y: number,
@@ -201,7 +236,7 @@ function label(
 }
 
 /** The silhouette has been laid down; from here on nothing should cast a shadow. */
-function clearShadow(context: Konva.Context) {
+function clearShadow(context: PainterContext) {
   context.setAttr('shadowColor', 'rgba(0,0,0,0)')
   context.setAttr('shadowBlur', 0)
   context.setAttr('shadowOffsetX', 0)
@@ -212,7 +247,7 @@ function clearShadow(context: Konva.Context) {
  * A browser tab: rounded on top, and flaring outwards at the bottom so it merges
  * into the toolbar. The flare is the whole reason a drawn tab looks like a tab.
  */
-function tabPath(context: Konva.Context, x: number, y: number, w: number, h: number, r: number) {
+function tabPath(context: PainterContext, x: number, y: number, w: number, h: number, r: number) {
   context.beginPath()
   context.moveTo(x - r, y + h)
   context.quadraticCurveTo(x, y + h, x, y + h - r)
@@ -226,7 +261,7 @@ function tabPath(context: Konva.Context, x: number, y: number, w: number, h: num
 }
 
 /** Padlock in the address bar — the detail every real omnibox has. */
-function padlock(context: Konva.Context, x: number, y: number, size: number, color: string) {
+function padlock(context: PainterContext, x: number, y: number, size: number, color: string) {
   const w = size * 0.72
   const h = size * 0.56
   fillRounded(context, color, x - w / 2, y - h / 2 + size * 0.12, w, h, size * 0.14)
@@ -239,7 +274,14 @@ function padlock(context: Konva.Context, x: number, y: number, size: number, col
 }
 
 /** Reload glyph: a nearly closed ring with an arrowhead where it opens. */
-function reload(context: Konva.Context, x: number, y: number, r: number, color: string, w: number) {
+function reload(
+  context: PainterContext,
+  x: number,
+  y: number,
+  r: number,
+  color: string,
+  w: number,
+) {
   context.beginPath()
   context.arc(x, y, r, Math.PI * 0.42, Math.PI * 2)
   context.setAttr('strokeStyle', color)
@@ -257,7 +299,7 @@ function reload(context: Konva.Context, x: number, y: number, r: number, color: 
 
 /** The tab strip: window buttons, the active tab, a couple of neighbours, and a plus. */
 function drawTabs(
-  context: Konva.Context,
+  context: PainterContext,
   width: number,
   top: number,
   tabH: number,
@@ -410,7 +452,7 @@ function drawTabs(
 
 /** Toolbar row: navigation glyphs, the address pill, and the menu. */
 function drawToolbar(
-  context: Konva.Context,
+  context: PainterContext,
   width: number,
   barH: number,
   frame: BrowserFrame,
@@ -467,7 +509,7 @@ function drawToolbar(
 
 /** Browser window above the capture. Width and height are in capture coordinates. */
 function drawBrowser(
-  context: Konva.Context,
+  context: PainterContext,
   width: number,
   height: number,
   frame: BrowserFrame,
@@ -505,7 +547,7 @@ function drawBrowser(
 
 /** Buttons straddling the body edge, drawn first so the body covers their inner half. */
 function drawButtons(
-  context: Konva.Context,
+  context: PainterContext,
   width: number,
   height: number,
   mockup: Exclude<DeviceMockup, 'none'>,
@@ -543,7 +585,7 @@ function baseBox(width: number, height: number, bezel: number) {
 
 /** Laptop deck under the screen: a tapered slab, drawn before the lid so it shares the shadow. */
 function fillBase(
-  context: Konva.Context,
+  context: PainterContext,
   width: number,
   height: number,
   bezel: number,
@@ -571,7 +613,7 @@ function fillBase(
 
 /** Hinge line along the top of the deck, and the notch the lid is opened by. */
 function detailBase(
-  context: Konva.Context,
+  context: PainterContext,
   width: number,
   height: number,
   bezel: number,
@@ -595,7 +637,7 @@ function detailBase(
 
 /** Device body around the capture. */
 function drawDevice(
-  context: Konva.Context,
+  context: PainterContext,
   width: number,
   height: number,
   mockup: Exclude<DeviceMockup, 'none'>,
@@ -666,7 +708,7 @@ function drawDevice(
 
 /** Camera hardware in the top bezel: island, punch-hole, notch, or a bare lens. */
 function drawCutout(
-  context: Konva.Context,
+  context: PainterContext,
   width: number,
   cutout: DeviceSpec['cutout'],
   inset: number,
@@ -710,7 +752,7 @@ export function decorationScene(
 ) {
   const { frame, mockup, radius, customMockup } = decoration
 
-  return (context: Konva.Context, shape: Konva.Shape) => {
+  return (context: PainterContext, shape: PainterShape) => {
     const width = shape.width()
     const height = shape.height()
     if (width <= 0 || height <= 0) return
@@ -731,4 +773,47 @@ export function decorationScene(
 
     if (frame.style !== 'none') drawBrowser(context, width, height, frame, domain, radius)
   }
+}
+
+/**
+ * Runs the painter against a plain 2D context.
+ *
+ * The only thing Konva adds is `setAttr`, which exists so it can keep its own copy of the
+ * canvas state; assigning straight to the context does the same job. Everything else the
+ * painter calls is standard 2D — which is why the browser chrome around a clip is drawn
+ * by the same code that draws it around a screenshot, rather than by a second
+ * implementation that would drift from the first.
+ */
+export function paintDecoration(
+  context: CanvasRenderingContext2D,
+  decoration: Decoration,
+  domain: string | null,
+  width: number,
+  height: number,
+  custom: HTMLImageElement | null = null,
+): void {
+  // A proxy rather than a wrapper object: canvas methods refuse to run with anything but
+  // the real context as their receiver, so every function is handed back bound to it.
+  const adapted = new Proxy(context, {
+    get(target, property) {
+      if (property === 'setAttr') {
+        return (name: string, value: unknown) => {
+          Reflect.set(target, name, value)
+        }
+      }
+      const value = Reflect.get(target, property) as unknown
+      return typeof value === 'function'
+        ? (value as (...args: never[]) => unknown).bind(target)
+        : value
+    },
+  }) as unknown as PainterContext
+
+  decorationScene(
+    decoration,
+    domain,
+    custom,
+  )(adapted, {
+    width: () => width,
+    height: () => height,
+  })
 }

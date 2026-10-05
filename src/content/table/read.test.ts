@@ -2,7 +2,7 @@
 
 import { beforeEach, describe, expect, it } from 'vitest'
 
-import { cellText, closestTable, dataRowCount, isTableLike, readTable } from './read'
+import { cellText, closestTable, dataRowCount, findTables, isTableLike, readTable } from './read'
 
 function mount(html: string): Element {
   document.body.innerHTML = html
@@ -154,6 +154,31 @@ describe('closestTable', () => {
       '<div><table><tr><td>a</td></tr></table><table><tr><td>b</td></tr></table></div>',
     )
     expect(closestTable(wrapper)).toBeNull()
+  })
+})
+
+describe('findTables', () => {
+  it('finds every table on the page, real or ARIA', () => {
+    mount(`
+      <div>
+        <table id="one"><tr><td>a</td></tr></table>
+        <div id="two" role="grid"><div role="row"><div role="cell">b</div></div></div>
+      </div>
+    `)
+    expect(findTables().map((table) => table.id)).toEqual(['one', 'two'])
+  })
+
+  /** Two badges over the same data would just be two ways to copy the same rows. */
+  it('keeps only the outer table of a nest', () => {
+    mount(
+      '<table id="outer"><tr><td><table id="inner"><tr><td>a</td></tr></table></td></tr></table>',
+    )
+    expect(findTables().map((table) => table.id)).toEqual(['outer'])
+  })
+
+  it('skips hidden tables', () => {
+    mount('<div><table hidden><tr><td>a</td></tr></table></div>')
+    expect(findTables()).toHaveLength(0)
   })
 })
 

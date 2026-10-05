@@ -17,7 +17,8 @@ export const PROMPT_AFTER_EXPORTS = 5
 export const PROMPT_QUIET_DAYS = 3
 
 export function storeReviewUrl(): string {
-  return `https://chromewebstore.google.com/detail/${chrome.runtime.id}/reviews`
+  // Unpacked builds have a different runtime id; reviews belong to the published listing.
+  return 'https://chromewebstore.google.com/detail/emahpjdcneajnkjmpdegllokcllaglme/reviews'
 }
 
 export type FeedbackState = {

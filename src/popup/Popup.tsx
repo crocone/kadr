@@ -7,7 +7,7 @@ import { ensureOrigin } from '@/core/permissions/host-access'
 import { listDocs, type StoredDoc } from '@/core/storage/db'
 import { useT } from '@/core/ui/app-context'
 import { cn } from '@/core/ui/cn'
-import { Button, Hotkey } from '@/core/ui/components'
+import { Button } from '@/core/ui/components'
 import {
   IconArea,
   IconElement,
@@ -22,6 +22,7 @@ import {
 } from '@/core/ui/icons'
 
 import { RecentShot } from './RecentShot'
+import { RecordPanel } from './RecordPanel'
 
 const MODE_LABELS: Record<
   CaptureMode,
@@ -283,6 +284,11 @@ export function Popup() {
         </button>
       </div>
 
+      <h2 className="mx-3 mt-1 mb-1.5 flex items-center font-mono text-[10px] tracking-[0.1em] text-text-muted uppercase">
+        {t('popup.record')}
+      </h2>
+      <RecordPanel tab={tab} onBusy={setBusy} />
+
       {someUnbound ? (
         <p className="mx-3 mb-2 rounded-lg bg-surface-muted px-2.5 py-2 text-[11px] text-text-muted">
           {t('popup.hotkey.taken')}{' '}
@@ -341,9 +347,6 @@ export function Popup() {
         >
           {t('popup.openEditor')}
         </Button>
-        <span className="ml-auto flex items-center gap-1.5" title={t('popup.record.soon')}>
-          <Hotkey>{t('common.soon')}</Hotkey>
-        </span>
       </footer>
     </div>
   )

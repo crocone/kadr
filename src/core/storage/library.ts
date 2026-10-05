@@ -40,15 +40,6 @@ export type Shelf = 'all' | 'today' | 'media' | 'annotated'
 
 export const SHELVES: readonly Shelf[] = ['all', 'today', 'media', 'annotated']
 
-/**
- * The `media` shelf is visible but empty and disabled: the doc model has no video or
- * GIF yet — screen recording ships with 1.1. Removing it from the list would mean
- * reshaping the sidebar when it arrives.
- */
-export function isShelfReady(shelf: Shelf): boolean {
-  return shelf !== 'media'
-}
-
 const DAY_MS = 24 * 60 * 60 * 1000
 
 /** Midnight of the day containing the moment. Local time, not UTC. */
@@ -75,7 +66,9 @@ export function shelfQuery(shelf: Shelf, now: number): LibraryQuery {
     case 'annotated':
       return { annotated: true }
     case 'media':
-      // Nothing to select: the shelf is disabled and its query must not match anything.
+      // Recordings are not documents and live in their own store, so this shelf is not
+      // a filter over the shot feed — the library swaps the feed for a clip list. The
+      // query has to match nothing, or a shelf showing clips would also show shots.
       return { from: Number.MAX_SAFE_INTEGER }
     case 'all':
       return {}
@@ -118,12 +111,18 @@ export function searchDocs(docs: readonly StoredDoc[], query: LibraryQuery): Sto
 
 export type ShelfCounts = Record<Shelf, number>
 
-/** Shot count per shelf. Computed over the whole library, not the filtered subset. */
-export function shelfCounts(docs: readonly StoredDoc[], now: number): ShelfCounts {
+/**
+ * Shot count per shelf. Computed over the whole library, not the filtered subset.
+ *
+ * `media` is counted separately and passed in: recordings live in their own store, and
+ * a function over documents has no way to see them.
+ */
+export function shelfCounts(docs: readonly StoredDoc[], now: number, clips = 0): ShelfCounts {
   const counts = {} as ShelfCounts
   for (const shelf of SHELVES) {
     counts[shelf] = docs.filter((doc) => matchesQuery(doc, shelfQuery(shelf, now))).length
   }
+  counts.media = clips
   return counts
 }
 

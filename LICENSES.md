@@ -24,6 +24,13 @@ in this table.
 | konva, react-konva | MIT        |
 | idb                | ISC        |
 | tesseract.js       | Apache-2.0 |
+| mediabunny         | MPL-2.0    |
+| gifenc             | MIT        |
+
+`mediabunny` is the one dependency that is not MIT-or-similar. MPL-2.0 is file-level
+copyleft: it is shipped unmodified and stays under its own licence, which is compatible
+with an MIT project. If its files are ever patched rather than merely used, those files
+have to stay MPL and the changes have to be published.
 
 Development dependencies are listed in `package.json`; run `npm ls --omit=dev` for the
 exact runtime tree of a given release.

@@ -65,7 +65,9 @@ describe('state', () => {
 })
 
 describe('storeReviewUrl', () => {
-  it('points at the reviews tab of this extension', () => {
-    expect(storeReviewUrl()).toBe('https://chromewebstore.google.com/detail/abc/reviews')
+  it('points at the published listing even when the runtime id belongs to a local build', () => {
+    expect(storeReviewUrl()).toBe(
+      'https://chromewebstore.google.com/detail/emahpjdcneajnkjmpdegllokcllaglme/reviews',
+    )
   })
 })
