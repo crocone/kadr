@@ -1,10 +1,10 @@
 {
   "extName": {
-    "message": "Kadr — screenshots & step guides",
+    "message": "Kadr — Screenshot, Screen Recorder & Step-by-Step Guides",
     "description": "Extension name shown in the store and the toolbar"
   },
   "extDescription": {
-    "message": "Capture any page, beautify the shot, record a click-by-click guide, redact private data offline. No trial, no watermarks.",
+    "message": "Capture full-page screenshots, record your screen with microphone audio, and turn clicks into step-by-step guides. No watermarks.",
     "description": "Extension description shown in the store"
   },
   "cmdCaptureFullPage": {
