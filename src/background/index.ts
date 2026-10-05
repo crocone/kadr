@@ -6,6 +6,7 @@
  */
 import contentScriptPath from '@/content/index?iife'
 import { CaptureFailure } from '@/core/capture/types'
+import { markInstalled } from '@/core/feedback'
 import { DEFAULT_LOCALE, resolveSystemLocale, translate } from '@/core/i18n'
 import type { Locale } from '@/core/i18n'
 import { CAPTURE_COMMANDS, type CaptureMode, registerMessageHandlers } from '@/core/messaging'
@@ -20,7 +21,7 @@ import {
   resolveTab,
   runCapture,
 } from './capture'
-import { captureModeForMenuItem, createContextMenus } from './context-menus'
+import { captureModeForMenuItem, createContextMenus, feedbackUrlForMenuItem } from './context-menus'
 import { ensureContentScript } from './content-script'
 import { keepServiceWorkerAlive } from './keep-alive'
 import { reshootDocs } from './reshoot'
@@ -145,6 +146,7 @@ chrome.runtime.onInstalled.addListener((details) => {
   // Onboarding is shown once, on install only: a welcome tab on every update is exactly
   // the kind of annoyance extensions get uninstalled for.
   if (details.reason === 'install') {
+    void markInstalled()
     void chrome.tabs.create({ url: chrome.runtime.getURL(WELCOME_PAGE) })
   }
 })
@@ -166,7 +168,12 @@ chrome.commands.onCommand.addListener((command, tab) => {
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
   const mode = captureModeForMenuItem(info.menuItemId)
-  if (mode) startCaptureFromGesture(mode, tab?.id)
+  if (mode) {
+    startCaptureFromGesture(mode, tab?.id)
+    return
+  }
+  const url = feedbackUrlForMenuItem(info.menuItemId)
+  if (url) void chrome.tabs.create({ url })
 })
 
 /**

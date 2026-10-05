@@ -1,3 +1,4 @@
+import { FEEDBACK_FORM_URL, storeReviewUrl } from '@/core/feedback'
 import { CAPTURE_COMMANDS, type CaptureMode } from '@/core/messaging'
 
 const PARENT_ID = 'kadr-root'
@@ -11,6 +12,23 @@ const ITEMS: { id: string; mode: CaptureMode; title: Record<'en' | 'ru', string>
     id: 'capture-scroll',
     mode: 'scroll',
     title: { en: 'Capture a chat or feed', ru: 'Снять чат или ленту' },
+  },
+]
+
+/**
+ * Feedback lives in the menu because that is where people are when a thought about
+ * the tool strikes: nobody goes looking for an email address.
+ */
+const FEEDBACK_ITEMS: { id: string; url: () => string; title: Record<'en' | 'ru', string> }[] = [
+  {
+    id: 'feedback-rate',
+    url: storeReviewUrl,
+    title: { en: 'Rate in the Web Store', ru: 'Оценить в Web Store' },
+  },
+  {
+    id: 'feedback-send',
+    url: () => FEEDBACK_FORM_URL,
+    title: { en: 'Suggest an idea or report a bug', ru: 'Предложить идею или сообщить об ошибке' },
   },
 ]
 
@@ -48,6 +66,20 @@ async function build(): Promise<void> {
       contexts: ['page', 'selection', 'image', 'link'],
     })
   }
+  await createItem({
+    id: 'feedback-separator',
+    parentId: PARENT_ID,
+    type: 'separator',
+    contexts: ['page', 'selection', 'image', 'link'],
+  })
+  for (const item of FEEDBACK_ITEMS) {
+    await createItem({
+      id: item.id,
+      parentId: PARENT_ID,
+      title: item.title[lang],
+      contexts: ['page', 'selection', 'image', 'link'],
+    })
+  }
 }
 
 /**
@@ -68,4 +100,8 @@ export function createContextMenus(): Promise<void> {
 
 export function captureModeForMenuItem(menuItemId: string | number): CaptureMode | undefined {
   return CAPTURE_COMMANDS[String(menuItemId)]
+}
+
+export function feedbackUrlForMenuItem(menuItemId: string | number): string | undefined {
+  return FEEDBACK_ITEMS.find((item) => item.id === String(menuItemId))?.url()
 }

@@ -41,6 +41,7 @@ import { ObjectBar } from './panels/ObjectBar'
 import { ToolOptions } from './panels/ToolOptions'
 import { SidePanel } from './panels/SidePanel'
 import { ToolRail } from './panels/ToolRail'
+import { FeedbackBar } from './FeedbackBar'
 import { TopBar } from './panels/TopBar'
 import type { TransformBox } from './layers/SelectionFrame'
 import { Stage } from './Stage'
@@ -507,6 +508,8 @@ export function Workspace({ stored }: { stored: StoredDoc }) {
         onRedo={redo}
         onCopy={exporter.copy}
       />
+
+      <FeedbackBar />
 
       <input
         ref={fileRef}

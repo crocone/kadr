@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { captureModeForMenuItem, createContextMenus } from './context-menus'
+import { captureModeForMenuItem, createContextMenus, feedbackUrlForMenuItem } from './context-menus'
 
 /** Live menu items: `create` on a taken id fails the same way Chrome's does. */
 function fakeMenus() {
@@ -47,6 +47,7 @@ describe('createContextMenus', () => {
       contextMenus: menus.api,
       i18n: { getUILanguage: () => 'ru-RU' },
       runtime: {
+        id: 'abc',
         get lastError() {
           return lastError
         },
@@ -62,6 +63,9 @@ describe('createContextMenus', () => {
       'capture-area',
       'capture-element',
       'capture-scroll',
+      'feedback-separator',
+      'feedback-rate',
+      'feedback-send',
     ])
   })
 
@@ -79,6 +83,7 @@ describe('createContextMenus', () => {
       contextMenus: menus.api,
       i18n: { getUILanguage: () => 'en-US' },
       runtime: {
+        id: 'abc',
         get lastError() {
           if (lastError) duplicates.push(lastError.message)
           return lastError
@@ -89,7 +94,7 @@ describe('createContextMenus', () => {
     await Promise.all([createContextMenus(), createContextMenus()])
 
     expect(duplicates).toEqual([])
-    expect(menus.items.size).toBe(6)
+    expect(menus.items.size).toBe(9)
   })
 })
 
@@ -97,5 +102,16 @@ describe('captureModeForMenuItem', () => {
   it('maps a menu id to the mode it captures', () => {
     expect(captureModeForMenuItem('capture-area')).toBe('area')
     expect(captureModeForMenuItem('something-else')).toBeUndefined()
+  })
+})
+
+describe('feedbackUrlForMenuItem', () => {
+  it('maps the feedback items to their links', () => {
+    vi.stubGlobal('chrome', { runtime: { id: 'abc' } })
+    expect(feedbackUrlForMenuItem('feedback-rate')).toBe(
+      'https://chromewebstore.google.com/detail/abc/reviews',
+    )
+    expect(feedbackUrlForMenuItem('feedback-send')).toMatch(/^https:/)
+    expect(feedbackUrlForMenuItem('capture-area')).toBeUndefined()
   })
 })

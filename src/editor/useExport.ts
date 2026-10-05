@@ -9,6 +9,7 @@ import type Konva from 'konva'
 import { type RefObject, useCallback, useMemo, useState } from 'react'
 
 import type { Doc } from '@/core/doc/types'
+import { recordExport } from '@/core/feedback'
 import { estimateBytes } from '@/core/render/estimate'
 import {
   ClipboardTooLarge,
@@ -119,6 +120,7 @@ export function useExport(doc: Doc, stageRef: RefObject<Konva.Stage | null>): Ex
             // Browsers reliably accept only PNG on the clipboard.
             const blob = await exportDocument(stage, doc, { format: 'png', quality: 1, scale })
             await copyImage(blob)
+            void recordExport()
             setStatus('copied')
             setTimeout(() => {
               setStatus('idle')
@@ -128,6 +130,7 @@ export function useExport(doc: Doc, stageRef: RefObject<Konva.Stage | null>): Ex
 
           const blob = await exportDocument(stage, doc, { format, quality, scale })
           await saveBlob(blob, await filenameFor(EXTENSION[format], stripMeta))
+          void recordExport()
 
           // The link goes to the clipboard after the download: had the export failed,
           // there would be nothing to share, yet the clipboard would already be clobbered.

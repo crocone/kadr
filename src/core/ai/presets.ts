@@ -69,7 +69,7 @@ export const PRESETS: readonly Preset[] = [
     imageModel: '',
     needsKey: false,
   },
-  { id: 'custom', label: 'Свой адрес', baseUrl: '', model: '', imageModel: '', needsKey: false },
+  { id: 'custom', label: 'Custom', baseUrl: '', model: '', imageModel: '', needsKey: false },
 ]
 
 export function presetById(id: PresetId): Preset {
