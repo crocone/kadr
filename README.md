@@ -4,6 +4,8 @@ Page capture, a screenshot beautifier and a click-to-guide recorder for Chromium
 browsers. Every editor feature is free and works offline. Nothing is behind a trial, a watermark
 or a PRO lock.
 
+[Google Chrome Store](https://chromewebstore.google.com/detail/kadr-%E2%80%94-screenshot-screen/emahpjdcneajnkjmpdegllokcllaglme)
+
 ## What it is meant to be
 
 |             |                                                                                                                                                                                                                                                                           |
